@@ -31,8 +31,8 @@ class Settings(BaseSettings):
     with environment variables.
     """
 
-    host: str = "127.0.0.1"
-    port: int = 8000
+    host: str = environ.get("api_host", "127.0.0.1")
+    port: int = environ.get("api_port", 8000)
     # quantity of workers for uvicorn
     workers_count: int = 1
     # Enable uvicorn reloading

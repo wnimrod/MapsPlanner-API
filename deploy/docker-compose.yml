@@ -6,53 +6,54 @@ services:
       context: .
       dockerfile: ./deploy/Dockerfile
       target: prod
-    image: MapsPlanner_API:${MAPSPLANNER_API_VERSION:-latest}
+    image: maps_planner_api:${MAPSPLANNER_API_VERSION:-latest}
     restart: always
+    ports:
+      - "8888:8888"
     env_file:
       - .env
     depends_on:
       db:
         condition: service_healthy
     environment:
-      MAPSPLANNER_API_HOST: 0.0.0.0
-      MAPSPLANNER_API_DB_HOST: MapsPlanner_API-db
-      MAPSPLANNER_API_DB_PORT: 5432
-      MAPSPLANNER_API_DB_USER: MapsPlanner_API
-      MAPSPLANNER_API_DB_PASS: MapsPlanner_API
-      MAPSPLANNER_API_DB_BASE: MapsPlanner_API
-
+      api_host: 0.0.0.0
+      api_port: 8888
+      db_host: maps_planner_api-db
+      db_port: 5432
+      db_user: maps_planner_api
+      db_pass: maps_planner_api
+      db_base: maps_planner_api
   db:
     image: postgres:13.8-bullseye
-    hostname: MapsPlanner_API-db
+    hostname: maps_planner_api-db
     environment:
-      POSTGRES_PASSWORD: "MapsPlanner_API"
-      POSTGRES_USER: "MapsPlanner_API"
-      POSTGRES_DB: "MapsPlanner_API"
+      POSTGRES_PASSWORD: "maps_planner_api"
+      POSTGRES_USER: "maps_planner_api"
+      POSTGRES_DB: "maps_planner_api"
+    ports:
+      - "15432:5432"
     volumes:
-      - MapsPlanner_API-db-data:/var/lib/postgresql/data
+      - maps_planner_api-db-data:/var/lib/postgresql/data
     restart: always
     healthcheck:
-      test: pg_isready -U MapsPlanner_API
+      test: pg_isready -U maps_planner_api
       interval: 2s
       timeout: 3s
       retries: 40
 
   migrator:
-    image: MapsPlanner_API:${MAPSPLANNER_API_VERSION:-latest}
+    image: maps_planner_api:${MAPSPLANNER_API_VERSION:-latest}
     restart: "no"
     command: alembic upgrade head
     environment:
-      MAPSPLANNER_API_DB_HOST: MapsPlanner_API-db
+      MAPSPLANNER_API_DB_HOST: maps_planner_api-db
       MAPSPLANNER_API_DB_PORT: 5432
-      MAPSPLANNER_API_DB_USER: MapsPlanner_API
-      MAPSPLANNER_API_DB_PASS: MapsPlanner_API
-      MAPSPLANNER_API_DB_BASE: MapsPlanner_API
+      MAPSPLANNER_API_DB_USER: maps_planner_api
+      MAPSPLANNER_API_DB_PASS: maps_planner_api
+      MAPSPLANNER_API_DB_BASE: maps_planner_api
     depends_on:
       db:
         condition: service_healthy
-
-
-
 volumes:
-  MapsPlanner_API-db-data:
-    name: MapsPlanner_API-db-data
+  maps_planner_api-db-data:
+    name: maps_planner_api-db-data
