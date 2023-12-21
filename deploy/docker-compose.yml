@@ -40,7 +40,6 @@ services:
       interval: 2s
       timeout: 3s
       retries: 40
-
   migrator:
     image: maps_planner_api:${MAPSPLANNER_API_VERSION:-latest}
     restart: "no"
