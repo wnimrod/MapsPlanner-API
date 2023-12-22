@@ -16,8 +16,8 @@ services:
       db:
         condition: service_healthy
     environment:
-      api_host: 0.0.0.0
-      api_port: 8888
+      host: 0.0.0.0
+      port: 8888
       db_host: maps_planner_api-db
       db_port: 5432
       db_user: maps_planner_api
@@ -44,12 +44,8 @@ services:
     image: maps_planner_api:${MAPSPLANNER_API_VERSION:-latest}
     restart: "no"
     command: alembic upgrade head
-    environment:
-      MAPSPLANNER_API_DB_HOST: maps_planner_api-db
-      MAPSPLANNER_API_DB_PORT: 5432
-      MAPSPLANNER_API_DB_USER: maps_planner_api
-      MAPSPLANNER_API_DB_PASS: maps_planner_api
-      MAPSPLANNER_API_DB_BASE: maps_planner_api
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
