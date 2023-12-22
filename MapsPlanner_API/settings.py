@@ -49,8 +49,10 @@ class Settings(BaseSettings):
     db_echo: bool = environ.get("db_echo", True)
 
     # Google auth variables
-    google_auth_client_id: str = environ.get("google_auth_client_id")
-    google_auth_client_secret: str = environ.get("google_auth_client_secret")
+    google_auth_client_id: str = environ["google_auth_client_id"]
+    google_auth_client_secret: str = environ["google_auth_client_secret"]
+
+    frontend_host: str = environ["frontend_host"]
 
     @property
     def db_url(self) -> URL:

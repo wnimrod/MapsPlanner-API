@@ -2,6 +2,8 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.responses import UJSONResponse
+from starlette.middleware.cors import CORSMiddleware
+
 from MapsPlanner_API.settings import settings
 from MapsPlanner_API.web.api.router import api_router
 from importlib import metadata
@@ -35,4 +37,18 @@ def get_app() -> FastAPI:
     # Main router for the API.
     app.include_router(router=api_router, prefix="/api")
 
+    allow_origins = [
+        settings.frontend_host,
+        f"https://{settings.host}:${settings.port}",
+        f"http://{settings.host}:${settings.port}",
+    ]
+
+    # Register middlewares
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allow_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     return app

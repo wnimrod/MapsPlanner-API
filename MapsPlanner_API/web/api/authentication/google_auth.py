@@ -6,7 +6,7 @@ import requests
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-from starlette.responses import Response
+from starlette.responses import RedirectResponse
 
 from MapsPlanner_API.db.dependencies import get_db_session
 from MapsPlanner_API.db.models.Session import SessionORM
@@ -74,7 +74,6 @@ class GoogleAuthenticator:
 
 @router.get("/")
 async def login_google(
-    response: Response,
     db: AsyncSession = Depends(get_db_session),
     code: Optional[str] = None,
 ):
@@ -101,12 +100,13 @@ async def login_google(
 
             # Set session cookie
             session: str = await SessionORM.create_session(db, user_orm)
-            response.set_cookie(key="token", value=session, secure=True)
-            response.status_code = (
-                status.HTTP_201_CREATED if user_created else status.HTTP_200_OK
+            response = RedirectResponse(
+                f"{settings.frontend_host}?signed_up={int(user_created)}"
             )
+            response.set_cookie(key="token", value=session, secure=True)
 
-            return {"is_created": user_created}
+            return response
+
         except requests.exceptions.HTTPError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
