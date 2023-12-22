@@ -1,8 +1,6 @@
-import os
 import enum
 from pathlib import Path
 from tempfile import gettempdir
-from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from yarl import URL
@@ -31,8 +29,8 @@ class Settings(BaseSettings):
     with environment variables.
     """
 
-    host: str = environ.get("api_host", "127.0.0.1")
-    port: int = environ.get("api_port", 8000)
+    host: str = environ.get("host", "127.0.0.1")
+    port: int = environ.get("port", 8000)
     # quantity of workers for uvicorn
     workers_count: int = 1
     # Enable uvicorn reloading
@@ -49,6 +47,10 @@ class Settings(BaseSettings):
     db_pass: str = environ.get("db_pass")
     db_base: str = environ.get("db_base")
     db_echo: bool = environ.get("db_echo", True)
+
+    # Google auth variables
+    google_auth_client_id: str = environ.get("google_auth_client_id")
+    google_auth_client_secret: str = environ.get("google_auth_client_secret")
 
     @property
     def db_url(self) -> URL:
@@ -68,7 +70,6 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(
         env_file=".env",
-        env_prefix="MAPSPLANNER_API_",
         env_file_encoding="utf-8",
     )
 
