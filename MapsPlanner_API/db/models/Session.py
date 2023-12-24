@@ -1,23 +1,26 @@
 import binascii
 import os
 from datetime import datetime
-from typing import Optional, Tuple
-
-from sqlalchemy import String, func, DateTime, ForeignKey, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import String, func, DateTime, ForeignKey
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from MapsPlanner_API.db.base import Base
 from MapsPlanner_API.db.models.User import UserORM
 
 
-class SessionORM(Base):
+class SessionORM(AsyncAttrs, Base):
+    """
+    User token management, for access control.
+    This allows to revoke anytime, and login from multiple devices.
+    """
+
     __tablename__ = "sessions"
 
     DEFAULT_TOKEN_LENGTH = 64
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    user: Mapped[UserORM] = relationship(UserORM, backref="tokens")
+    user: Mapped[UserORM] = relationship(UserORM, back_populates="tokens")
 
     token: Mapped[str] = mapped_column(String, primary_key=True)
     creation_date: Mapped[datetime] = mapped_column(
@@ -35,17 +38,3 @@ class SessionORM(Base):
         db.add(session)
         await db.commit()
         return token
-
-    @classmethod
-    async def get_user(cls, db: AsyncSession, token: str) -> Optional[UserORM]:
-        query = (
-            select(SessionORM, UserORM)
-            .where(SessionORM.token == token)
-            .join(UserORM, UserORM.id == SessionORM.user_id)
-        )
-        fetch_result: Optional[Tuple[SessionORM, UserORM]] = (
-            await db.execute(query)
-        ).fetchone()
-
-        if fetch_result:
-            return fetch_result[1]  # This is the user.

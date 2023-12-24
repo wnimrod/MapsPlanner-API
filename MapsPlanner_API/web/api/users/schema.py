@@ -8,3 +8,4 @@ class User(BaseModel):
     email: str
     profile_picture: str
     is_active: bool
+    is_administrator: bool

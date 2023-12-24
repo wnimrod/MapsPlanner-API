@@ -1,16 +1,17 @@
 import datetime
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy import select
 from sqlalchemy import String, DateTime, func, Boolean
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql import expression
 
 from MapsPlanner_API.db.base import Base
 from MapsPlanner_API.web.api.users.schema import User
 
 
-class UserORM(Base):
+class UserORM(AsyncAttrs, Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -22,11 +23,26 @@ class UserORM(Base):
     )
     profile_picture: Mapped[str] = mapped_column(String(), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean())
+    is_administrator: Mapped[bool] = mapped_column(
+        Boolean(), server_default=expression.false()
+    )
+
+    # Forward relations
+    tokens: Mapped[List["SessionORM"]] = relationship(
+        "SessionORM", back_populates="user"
+    )
+    trips: Mapped[List["TripORM"]] = relationship("TripORM", back_populates="user")
 
     def __str__(self) -> str:
         return f"User [#{self.id}]: {self.first_name} {self.last_name}"
 
-    def to_api_user(self) -> User:
+    @classmethod
+    async def get_user(cls, session: AsyncSession, email: str) -> Optional["UserORM"]:
+        query = select(UserORM).where(UserORM.email == email, UserORM.is_active == True)
+        result = await session.execute(query)
+        return result.scalar_one_or_none()
+
+    def to_api(self) -> User:
         return User(
             id=self.id,
             first_name=self.first_name,
@@ -34,10 +50,5 @@ class UserORM(Base):
             email=self.email,
             profile_picture=self.profile_picture,
             is_active=self.is_active,
+            is_administrator=self.is_administrator,
         )
-
-    @classmethod
-    async def get_user(cls, session: AsyncSession, email: str) -> Optional["UserORM"]:
-        query = select(UserORM).where(UserORM.email == email, UserORM.is_active == True)
-        result = await session.execute(query)
-        return result.scalar_one_or_none()

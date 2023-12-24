@@ -11,7 +11,7 @@ maintainers = [
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 fastapi = "^0.100.0"
 uvicorn = { version = "^0.22.0", extras = ["standard"] }
 gunicorn = "^21.2.0"
@@ -39,6 +39,7 @@ pytest-cov = "^4.0.0"
 anyio = "^3.6.2"
 pytest-env = "^0.8.1"
 httpx = "^0.23.3"
+ipython = "8.19.0"
 
 [tool.isort]
 profile = "black"

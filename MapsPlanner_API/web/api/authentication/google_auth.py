@@ -69,6 +69,7 @@ class GoogleAuthenticator:
             email=userinfo.email,
             profile_picture=userinfo.picture,
             is_active=True,
+            is_administrator=False,
         )
 
 
