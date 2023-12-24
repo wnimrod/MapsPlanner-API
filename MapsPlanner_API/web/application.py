@@ -1,12 +1,9 @@
-import logging
-
 from fastapi import FastAPI
 from fastapi.responses import UJSONResponse
 from starlette.middleware.cors import CORSMiddleware
 
 from MapsPlanner_API.settings import settings
 from MapsPlanner_API.web.api.router import api_router
-from importlib import metadata
 
 from MapsPlanner_API.web.lifetime import register_shutdown_event, register_startup_event
 

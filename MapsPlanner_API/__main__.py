@@ -1,6 +1,3 @@
-import os
-import shutil
-
 import uvicorn
 from MapsPlanner_API.gunicorn_runner import GunicornApplication
 from MapsPlanner_API.settings import settings

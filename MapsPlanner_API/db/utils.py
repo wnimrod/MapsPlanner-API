@@ -1,9 +1,6 @@
-import os
-
 from sqlalchemy import text
-from sqlalchemy.engine import URL, make_url
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.engine import make_url
+from sqlalchemy.ext.asyncio import create_async_engine
 from MapsPlanner_API.settings import settings
 
 
