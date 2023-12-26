@@ -45,11 +45,7 @@ async def get_trip(
             markers_orm = await trip_orm.awaitable_attrs.markers
             return TripDetails(
                 # TODO: Maybe there's a way to automatically extend TripDetails from `trip_card`?
-                id=trip_card.id,
-                name=trip_card.name,
-                picture=trip_card.picture,
-                creation_date=trip_card.creation_date,
-                user_id=trip_card.user_id,
+                **trip_card.model_dump(),
                 markers=[marker_orm.to_api() for marker_orm in markers_orm],
             )
         else:

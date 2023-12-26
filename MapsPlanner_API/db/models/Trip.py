@@ -40,6 +40,7 @@ class TripORM(AsyncAttrs, Base):
         return Trip(
             id=self.id,
             name=self.name,
+            description=self.description,
             picture=self.picture,
             creation_date=self.creation_date,
             user_id=self.user_id,

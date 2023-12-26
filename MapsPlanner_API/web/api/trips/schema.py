@@ -10,6 +10,7 @@ from MapsPlanner_API.web.api.schema import DateRangeFilter
 class Trip(BaseModel):
     id: int
     name: str
+    description: str
     picture: str
     creation_date: datetime.datetime
     user_id: int
