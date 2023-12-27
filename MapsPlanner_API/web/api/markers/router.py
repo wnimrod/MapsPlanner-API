@@ -129,4 +129,11 @@ async def delete_marker(
     user: Annotated[UserORM, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
 ):
-    raise NotImplementedError()
+    marker = await validate_marker_for_user(db, user, marker_id)
+    if not marker:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Marker #{marker_id} not found.",
+        )
+    await db.delete(marker)
+    response.status_code = status.HTTP_204_NO_CONTENT
