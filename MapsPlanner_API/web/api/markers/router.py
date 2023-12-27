@@ -17,8 +17,25 @@ from MapsPlanner_API.web.api.markers.schema import (
     APIMarkerUpdateRequest,
 )
 from MapsPlanner_API.web.api.users.views import get_current_user
+from MapsPlanner_API.web.api.markers.utils import validate_marker_for_user
 
 router = APIRouter(prefix="/markers", tags=["Markers"])
+
+
+@router.get("/{marker_id}")
+async def get_marker(
+    marker_id: int,
+    user: Annotated[UserORM, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db_session)],
+) -> Marker:
+    marker = await validate_marker_for_user(db, user, marker_id)
+    if not marker:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Marker #{marker_id} not found.",
+        )
+
+    return marker.to_api()
 
 
 @router.get("/{trip_id}")
