@@ -2,7 +2,7 @@ from typing import Annotated, List
 
 import sqlalchemy.exc
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
@@ -11,7 +11,11 @@ from MapsPlanner_API.db.dependencies import get_db_session
 from MapsPlanner_API.db.models.Marker import MarkerORM
 from MapsPlanner_API.db.models.Trip import TripORM
 from MapsPlanner_API.db.models.User import UserORM
-from MapsPlanner_API.web.api.markers.schema import Marker, APIMarkerCreationRequest
+from MapsPlanner_API.web.api.markers.schema import (
+    Marker,
+    APIMarkerCreationRequest,
+    APIMarkerUpdateRequest,
+)
 from MapsPlanner_API.web.api.users.views import get_current_user
 
 router = APIRouter(prefix="/markers", tags=["Markers"])
@@ -72,6 +76,33 @@ async def create_markers(
 
     response.status_code = status.HTTP_201_CREATED
     return [marker_orm.to_api() for marker_orm in markers_orm]
+
+
+@router.patch("/{marker_id}")
+async def update_marker(
+    marker_id: int,
+    payload: APIMarkerUpdateRequest,
+    user: Annotated[UserORM, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db_session)],
+) -> Marker:
+    update_fields = payload.model_dump(exclude_none=True)
+    user_trips_ids = [trip.id for trip in await user.awaitable_attrs.trips]
+
+    query = (
+        update(MarkerORM)
+        .where(MarkerORM.id == marker_id, MarkerORM.trip_id.in_(user_trips_ids))
+        .values(**update_fields)
+    )
+
+    update_result = await db.execute(query)
+
+    if update_result.rowcount == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Marker not found."
+        )
+    else:
+        updated_marker = await db.get(MarkerORM, marker_id)
+        return updated_marker
 
 
 @router.delete("/{marker_id}")

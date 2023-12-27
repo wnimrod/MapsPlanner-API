@@ -25,6 +25,7 @@ class MarkerORM(Base):
     def to_api(self) -> Marker:
         return Marker(
             id=self.id,
+            trip_id=self.trip_id,
             category=EMarkerCategory(self.category),
             title=self.title,
             description=self.description,

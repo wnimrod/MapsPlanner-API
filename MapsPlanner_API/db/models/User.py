@@ -31,7 +31,9 @@ class UserORM(AsyncAttrs, Base):
     tokens: Mapped[List["SessionORM"]] = relationship(
         "SessionORM", back_populates="user"
     )
-    trips: Mapped[List["TripORM"]] = relationship("TripORM", back_populates="user")
+    trips: Mapped[List["TripORM"]] = relationship(
+        "TripORM", back_populates="user", order_by="desc(TripORM.id)"
+    )
 
     def __str__(self) -> str:
         return f"User [#{self.id}]: {self.first_name} {self.last_name}"
