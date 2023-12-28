@@ -36,10 +36,10 @@ class TripORM(AsyncAttrs, Base):
     )
     user: Mapped[UserORM] = relationship(UserORM, back_populates="trips")
 
-    def to_api(self) -> "Trip":
+    def to_api(self, detailed: bool = False) -> "Trip":
         from MapsPlanner_API.web.api.trips.schema import Trip
 
-        return Trip(
+        trip = Trip(
             id=self.id,
             name=self.name,
             description=self.description,
@@ -47,6 +47,11 @@ class TripORM(AsyncAttrs, Base):
             creation_date=self.creation_date,
             user_id=self.user_id,
         )
+
+        if detailed:
+            raise NotImplementedError("Need to somehow fetch markers ......")
+        else:
+            return trip
 
     def is_accessible_to_user(self, user: UserORM) -> bool:
         return user.is_active and (self.user_id == user.id or user.is_administrator)
