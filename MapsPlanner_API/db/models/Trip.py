@@ -32,7 +32,9 @@ class TripORM(AsyncAttrs, Base):
 
     # Forward relations
     markers: Mapped[List[MarkerORM]] = relationship(
-        MarkerORM, back_populates="trip", order_by="asc(MarkerORM.id)"
+        MarkerORM,
+        back_populates="trip",
+        order_by="asc(MarkerORM.id)",
     )
     user: Mapped[UserORM] = relationship(UserORM, back_populates="trips")
 

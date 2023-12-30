@@ -15,9 +15,13 @@ from MapsPlanner_API.web.api.markers.schema import (
     Marker,
     APIMarkerCreationRequest,
     APIMarkerUpdateRequest,
+    APIMarkerGenerationRequest,
 )
 from MapsPlanner_API.web.api.users.views import get_current_user
 from MapsPlanner_API.web.api.markers.utils import validate_marker_for_user
+from MapsPlanner_API.web.api.markers.logic import MarkerLogic
+from MapsPlanner_API.web.api.markers.transformers import MarkerTransformer
+from MapsPlanner_API.web.api.trips.utils import validate_trip_for_user
 
 router = APIRouter(prefix="/markers", tags=["Markers"])
 
@@ -73,26 +77,40 @@ async def create_markers(
     allowed_trips_query = (
         select(TripORM.id).where(TripORM.user_id == user.id).distinct(TripORM.id)
     )
+
     allowed_trip_ids = (await db.scalars(allowed_trips_query)).all()
 
-    markers_orm = [
-        MarkerORM(
-            trip_id=marker_creation_request.trip_id,
-            category=marker_creation_request.category.value,
-            title=marker_creation_request.title,
-            description=marker_creation_request.description,
-            latitude=marker_creation_request.latitude,
-            longitude=marker_creation_request.longitude,
-        )
-        for marker_creation_request in payload
-        if marker_creation_request.trip_id in allowed_trip_ids
+    valid_creation_requests = [
+        creation_request
+        for creation_request in payload
+        if creation_request.trip_id in allowed_trip_ids
     ]
+
+    markers_orm = MarkerTransformer.marker_creation_requests_to_markers(
+        valid_creation_requests
+    )
 
     db.add_all(markers_orm)
     await db.commit()
 
     response.status_code = status.HTTP_201_CREATED
     return [marker_orm.to_api() for marker_orm in markers_orm]
+
+
+@router.post("/{trip_id}/generate-markers")
+async def generate_markers(
+    trip_id: int,
+    payload: APIMarkerGenerationRequest,
+    user: Annotated[UserORM, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db_session)],
+) -> List[Marker]:
+    assert trip_id == payload.trip_id
+
+    trip: TripORM = await validate_trip_for_user(
+        db, user, trip_id, raise_on_not_found=True
+    )
+
+    return await MarkerLogic.generate_markers_suggestions(db, trip, payload.categories)
 
 
 @router.patch("/{marker_id}")
@@ -119,7 +137,7 @@ async def update_marker(
         )
     else:
         updated_marker = await db.get(MarkerORM, marker_id)
-        return updated_marker
+        return updated_marker.to_api()
 
 
 @router.delete("/{marker_id}")

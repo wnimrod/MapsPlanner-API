@@ -48,11 +48,14 @@ class Settings(BaseSettings):
     db_base: str = environ.get("db_base")
     db_echo: bool = environ.get("db_echo", True)
 
+    frontend_host: str = environ["frontend_host"]
+
     # Google auth variables
     google_auth_client_id: str = environ["google_auth_client_id"]
     google_auth_client_secret: str = environ["google_auth_client_secret"]
 
-    frontend_host: str = environ["frontend_host"]
+    # ChatGPT
+    chatgpt_api_key: str = environ["chatgpt_api_key"]
 
     @property
     def db_url(self) -> URL:
