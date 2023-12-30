@@ -1,13 +1,10 @@
 [tool.poetry]
 name = "MapsPlanner_API"
-version = "0.1.0"
-description = ""
-authors = [
+version = "0.0.2"
+description = "A backend for the MapsPlanner react application."
+authors = ["Nimrod Wagner <nimrod7676@gmail.com>"]
+maintainers = []
 
-]
-maintainers = [
-
-]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -21,7 +18,7 @@ yarl = "^1.9.2"
 ujson = "^5.8.0"
 SQLAlchemy = {version = "^2.0.18", extras = ["asyncio"]}
 alembic = "^1.11.1"
-asyncpg = {version = "^0.28.0", extras = ["sa"]}
+asyncpg = { version = "^0.28.0", extras = ["sa"] }
 httptools = "^0.6.0"
 python-multipart = "0.0.6"
 requests = "2.31.0"

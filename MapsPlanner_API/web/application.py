@@ -7,7 +7,7 @@ from MapsPlanner_API.web.api.router import api_router
 
 from MapsPlanner_API.web.lifetime import register_shutdown_event, register_startup_event
 
-__version__ = "0.1.0"  # metadata.version('MapsPlanner_API')
+from MapsPlanner_API import __version__
 
 
 def get_app() -> FastAPI:
@@ -35,7 +35,8 @@ def get_app() -> FastAPI:
     app.include_router(router=api_router, prefix="/api")
 
     allow_origins = [
-        settings.frontend_host,
+        settings.frontend_url,
+        settings.backend_url,
         f"https://{settings.host}:${settings.port}",
         f"http://{settings.host}:${settings.port}",
     ]

@@ -1,5 +1,6 @@
 version: '3.9'
 
+
 services:
   api: &main_app
     build:
@@ -15,21 +16,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      host: 0.0.0.0
-      port: 8888
-      db_host: maps_planner_api-db
-      db_port: 5432
-      db_user: maps_planner_api
-      db_pass: maps_planner_api
-      db_base: maps_planner_api
   db:
     image: postgres:13.8-bullseye
     hostname: maps_planner_api-db
-    environment:
-      POSTGRES_PASSWORD: "maps_planner_api"
-      POSTGRES_USER: "maps_planner_api"
-      POSTGRES_DB: "maps_planner_api"
+    env_file: .env
     ports:
       - "15432:5432"
     volumes:

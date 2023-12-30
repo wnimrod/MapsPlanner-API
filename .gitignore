@@ -109,7 +109,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+.env*
 .venv
 env/
 venv/
@@ -140,3 +140,5 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+deploy/push_image.py

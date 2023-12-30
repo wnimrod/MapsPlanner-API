@@ -5,6 +5,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from yarl import URL
 
+from MapsPlanner_API import Environment
+
 TEMP_DIR = Path(gettempdir())
 
 from os import environ
@@ -36,10 +38,11 @@ class Settings(BaseSettings):
     # Enable uvicorn reloading
     reload: bool = False
 
-    # Current environment
-    environment: str = "dev"
+    log_level: LogLevel = LogLevel.DEBUG
 
-    log_level: LogLevel = LogLevel.INFO
+    # Current environment
+    environment: Environment = Environment(environ["environment"])
+
     # Variables for the database
     db_host: str = environ.get("db_host", "localhost")
     db_port: int = environ.get("db_port", 5432)
@@ -48,11 +51,13 @@ class Settings(BaseSettings):
     db_base: str = environ.get("db_base")
     db_echo: bool = environ.get("db_echo", True)
 
-    frontend_host: str = environ["frontend_host"]
-
+    backend_url: str = environ["backend_url"]
+    frontend_url: str = environ["frontend_url"]
     # Google auth variables
     google_auth_client_id: str = environ["google_auth_client_id"]
     google_auth_client_secret: str = environ["google_auth_client_secret"]
+
+    user_auto_approval: bool = environ["user_auto_approval"]
 
     # ChatGPT
     chatgpt_api_key: str = environ["chatgpt_api_key"]

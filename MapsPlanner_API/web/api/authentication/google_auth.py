@@ -16,7 +16,7 @@ from MapsPlanner_API.settings import settings
 
 router = APIRouter(prefix="/google")
 
-logger = getLogger("app")
+logger = getLogger("api")
 
 
 class GoogleUserInfo(BaseModel):
@@ -32,7 +32,7 @@ class GoogleUserInfo(BaseModel):
 class GoogleAuthenticator:
     client_id = settings.google_auth_client_id
     client_secret = settings.google_auth_client_secret
-    redirect_uri = "http://localhost:8888/api/auth/google"
+    redirect_uri = f"{settings.backend_url}/api/auth/google"
     scopes = ["openid", "profile", "email"]
 
     @classmethod
@@ -68,7 +68,7 @@ class GoogleAuthenticator:
             last_name=userinfo.family_name,
             email=userinfo.email,
             profile_picture=userinfo.picture,
-            is_active=True,
+            is_active=settings.user_auto_approval,
             is_administrator=False,
         )
 
@@ -102,13 +102,13 @@ async def login_google(
             # Set session cookie
             session: str = await SessionORM.create_session(db, user_orm)
             response = RedirectResponse(
-                f"{settings.frontend_host}?signed_up={int(user_created)}"
+                f"{settings.frontend_url}?signed_up={int(user_created)}"
             )
             response.set_cookie(key="token", value=session, secure=True)
-
             return response
 
-        except requests.exceptions.HTTPError:
+        except requests.exceptions.HTTPError as ex:
+            logger.exception(f"Authentication Failed: {str(ex) or '---'}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Authentication Failed",

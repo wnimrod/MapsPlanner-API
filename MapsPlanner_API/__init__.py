@@ -1,3 +1,11 @@
 """MapsPlanner_API package."""
 
-__version__ = "1.0.0"
+__version__ = "0.0.3"
+
+from enum import Enum
+
+
+class Environment(Enum):
+    Local = "local"
+    Testing = "testing"
+    Production = "production"
