@@ -1,6 +1,8 @@
 import enum
 from pathlib import Path
 from tempfile import gettempdir
+
+from pydantic import Extra
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from yarl import URL
@@ -23,7 +25,7 @@ class LogLevel(str, enum.Enum):  # noqa: WPS600
     FATAL = "FATAL"
 
 
-class Settings(BaseSettings):
+class Settings(BaseSettings, extra=Extra.allow):
     """
     Application settings.
 
