@@ -13,3 +13,7 @@ services:
     environment:
       # Enables autoreload.
       reload: "True"
+  db:
+    ports:
+      - "15432:5432"
+

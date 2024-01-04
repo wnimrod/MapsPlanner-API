@@ -38,9 +38,12 @@ class UserORM(AsyncAttrs, Base):
     def __str__(self) -> str:
         return f"User [#{self.id}]: {self.first_name} {self.last_name}"
 
+    def __repr__(self):
+        return str(self)
+
     @classmethod
     async def get_user(cls, session: AsyncSession, email: str) -> Optional["UserORM"]:
-        query = select(UserORM).where(UserORM.email == email, UserORM.is_active == True)
+        query = select(UserORM).where(UserORM.email == email)
         result = await session.execute(query)
         return result.scalar_one_or_none()
 

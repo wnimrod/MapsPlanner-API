@@ -46,20 +46,21 @@ class Settings(BaseSettings, extra=Extra.allow):
     environment: Environment = Environment(environ["environment"])
 
     # Variables for the database
-    db_host: str = environ.get("db_host", "localhost")
-    db_port: int = environ.get("db_port", 5432)
-    db_user: str = environ.get("db_user")
-    db_pass: str = environ.get("db_pass")
-    db_base: str = environ.get("db_base")
-    db_echo: bool = environ.get("db_echo", True)
+    db_host: str = environ["db_host"]
+    db_port: int = environ["db_port"]
+    db_user: str = environ["db_user"]
+    db_pass: str = environ["db_pass"]
+    db_base: str = environ["db_base"]
+    db_echo: bool = environ.get("db_echo", False)
 
     backend_url: str = environ["backend_url"]
     frontend_url: str = environ["frontend_url"]
+
+    user_auto_approval: bool = environ["user_auto_approval"]
+
     # Google auth variables
     google_auth_client_id: str = environ["google_auth_client_id"]
     google_auth_client_secret: str = environ["google_auth_client_secret"]
-
-    user_auto_approval: bool = environ["user_auto_approval"]
 
     # ChatGPT
     chatgpt_api_key: str = environ["chatgpt_api_key"]

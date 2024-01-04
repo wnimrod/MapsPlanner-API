@@ -26,3 +26,11 @@ def image_url_as_base64(url: str, raise_on_error: bool = True) -> Optional[str]:
     else:
         logger.warning(f"Invalid image url received; content-type is {content_type}.")
         return None
+
+
+def raise_(exception: Exception):
+    """
+    A utility to raise exception inside a lambda.
+    For testing purposes.
+    """
+    raise exception

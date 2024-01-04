@@ -1,18 +1,18 @@
-import asyncio
-import sys
-import uuid
-from asyncio.events import AbstractEventLoop
-from typing import Any, AsyncGenerator, Generator
-from unittest.mock import Mock
+import json
+
+from datetime import datetime
+from pathlib import Path
+from typing import Any, AsyncGenerator, List
 
 import pytest
+from _pytest.fixtures import FixtureRequest
 from fastapi import FastAPI
 from httpx import AsyncClient
 
+from MapsPlanner_API.db.models.User import UserORM
 from MapsPlanner_API.settings import settings
 from MapsPlanner_API.web.application import get_app
 from sqlalchemy.ext.asyncio import (
-    AsyncConnection,
     AsyncEngine,
     AsyncSession,
     async_sessionmaker,
@@ -46,7 +46,7 @@ async def _engine() -> AsyncGenerator[AsyncEngine, None]:
 
     await create_database()
 
-    engine = create_async_engine(str(settings.db_url))
+    engine = create_async_engine(str(settings.db_url), echo=settings.db_echo)
     async with engine.begin() as conn:
         await conn.run_sync(meta.create_all)
 
@@ -71,7 +71,7 @@ async def dbsession(
     :yields: async session.
     """
     connection = await _engine.connect()
-    trans = await connection.begin()
+    trans = await connection.begin_nested()
 
     session_maker = async_sessionmaker(
         connection,
@@ -113,3 +113,27 @@ async def client(
     """
     async with AsyncClient(app=fastapi_app, base_url="http://test") as ac:
         yield ac
+
+
+@pytest.fixture
+async def users(dbsession: AsyncSession, request: FixtureRequest) -> List[UserORM]:
+    """
+    Populate database with mock users.
+    """
+
+    with open(
+        Path(request.config.rootpath, "MapsPlanner_API/tests/fixtures/users.json")
+    ) as mock_file:
+        mock_users: List[dict] = json.load(mock_file)
+
+    orm_users: List[UserORM] = []
+
+    for mock_user in mock_users:
+        register_date = datetime.fromisoformat(mock_user.pop("register_date"))
+        user = UserORM(**mock_user, register_date=register_date)
+        orm_users.append(user)
+        dbsession.add(user)
+
+    await dbsession.commit()
+
+    return orm_users

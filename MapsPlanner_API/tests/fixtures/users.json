@@ -1,0 +1,47 @@
+[
+  {
+    "first_name": "John",
+    "last_name": "Doe",
+    "email": "john.doe@example.com",
+    "register_date": "2023-01-05",
+    "profile_picture": null,
+    "is_active": true,
+    "is_administrator": false
+  },
+  {
+    "first_name": "Jane",
+    "last_name": "Smith",
+    "email": "jane.smith@example.com",
+    "register_date": "2023-02-10",
+    "profile_picture": null,
+    "is_active": true,
+    "is_administrator": false
+  },
+  {
+    "first_name": "Alice",
+    "last_name": "Johnson",
+    "email": "alice.johnson@example.com",
+    "register_date": "2023-03-15",
+    "profile_picture": null,
+    "is_active": true,
+    "is_administrator": false
+  },
+  {
+    "first_name": "Bob",
+    "last_name": "Williams",
+    "email": "bob.williams@example.com",
+    "register_date": "2023-04-20",
+    "profile_picture": null,
+    "is_active": true,
+    "is_administrator": false
+  },
+  {
+    "first_name": "Eva",
+    "last_name": "Brown",
+    "email": "eva.brown@example.com",
+    "register_date": "2023-05-25",
+    "profile_picture": null,
+    "is_active": true,
+    "is_administrator": false
+  }
+]

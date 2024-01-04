@@ -7,5 +7,6 @@ from enum import Enum
 
 class Environment(Enum):
     Local = "local"
+    Pytest = "pytest"
     Testing = "testing"
     Production = "production"
