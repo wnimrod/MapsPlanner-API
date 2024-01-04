@@ -8,6 +8,8 @@ from starlette import status
 from MapsPlanner_API.db.models.Trip import TripORM
 from MapsPlanner_API.db.models.User import UserORM
 
+from datetime import datetime, timezone
+
 
 async def validate_trip_for_user(
     db: AsyncSession, user: UserORM, trip_id: int, raise_on_not_found: bool = False
@@ -27,3 +29,14 @@ async def validate_trip_for_user(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found.")
     else:
         return trip
+
+
+def date_range_param_validator(
+    date_range: str,
+) -> [Optional[datetime], Optional[datetime]]:
+    start, end = date_range.split("-")
+
+    return [
+        datetime.fromtimestamp(float(ts), tz=timezone.utc) if ts else None
+        for ts in [start, end]
+    ]

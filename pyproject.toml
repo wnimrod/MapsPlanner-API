@@ -40,6 +40,7 @@ pytest-env = "^0.8.1"
 httpx = "^0.23.3"
 ipython = "8.19.0"
 nltk = "3.8.1"
+python-dateutil = "2.8.2"
 
 [tool.isort]
 profile = "black"

@@ -1,7 +1,9 @@
-from typing import Annotated, List
+from typing import Annotated, Optional, List
 
 import sqlalchemy.exc
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import AfterValidator
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
@@ -14,6 +16,7 @@ from MapsPlanner_API.web.api.trips.schema import (
     Trip,
     TripDetails,
 )
+from MapsPlanner_API.web.api.trips.utils import date_range_param_validator
 from MapsPlanner_API.web.api.users.views import get_current_user
 
 router = APIRouter(prefix="/trips", tags=["Trips"])
@@ -22,6 +25,18 @@ router = APIRouter(prefix="/trips", tags=["Trips"])
 @router.get("/")
 async def get_trips(
     user: Annotated[UserORM, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db_session)],
+    creation_date: Optional[
+        Annotated[
+            str,
+            AfterValidator(date_range_param_validator),
+            Query(
+                description='Unix timestamp date range, in format of "start-end".',
+                examples=["1704242003-1704328403"],
+            ),
+        ]
+    ] = None,
+    name: Optional[str] = None,
 ):
     # TODO: Apply filters and pagination
     trips_orm: List[TripORM] = await user.awaitable_attrs.trips
