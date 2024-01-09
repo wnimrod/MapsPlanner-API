@@ -100,11 +100,11 @@ async def login_google(
                 await db.commit()
 
             # Set session cookie
-            session: str = await SessionORM.create_session(db, user_orm)
+            session: SessionORM = await SessionORM.create_session(db, user_orm)
             response = RedirectResponse(
                 f"{settings.frontend_url}?signed_up={int(user_created)}"
             )
-            response.set_cookie(key="token", value=session, secure=True)
+            response.set_cookie(key="token", value=session.token, secure=True)
             return response
 
         except requests.exceptions.HTTPError as ex:

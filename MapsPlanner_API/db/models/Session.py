@@ -32,9 +32,9 @@ class SessionORM(AsyncAttrs, Base):
         return binascii.hexlify(os.urandom(length // 2)).decode()
 
     @classmethod
-    async def create_session(cls, db: AsyncSession, user: UserORM) -> str:
+    async def create_session(cls, db: AsyncSession, user: UserORM) -> "SessionORM":
         token = cls._generate_token()
         session: SessionORM = SessionORM(user=user, token=token)
         db.add(session)
         await db.commit()
-        return token
+        return session
