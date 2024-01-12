@@ -9,11 +9,18 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy_utils import ChoiceType
 
+import enum
+
 # revision identifiers, used by Alembic.
 revision = "03533ceead47"
 down_revision = "498cdd2ee6b2"
 branch_labels = None
 depends_on = None
+
+
+class EGender(enum.Enum):
+    male = "M"
+    female = "F"
 
 
 def upgrade() -> None:
@@ -22,7 +29,7 @@ def upgrade() -> None:
         "users",
         sa.Column(
             "gender",
-            ChoiceType((("M", "male"), ("F", "female")), impl=sa.String(length=1)),
+            ChoiceType(EGender, impl=sa.String(length=1)),
             nullable=True,
         ),
     )

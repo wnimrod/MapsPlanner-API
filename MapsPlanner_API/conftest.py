@@ -9,7 +9,8 @@ from _pytest.fixtures import FixtureRequest
 from fastapi import FastAPI
 from httpx import AsyncClient
 
-from MapsPlanner_API.db.models.User import UserORM
+from MapsPlanner_API.db.models.Session import SessionORM
+from MapsPlanner_API.db.models.User import UserORM, EGender
 from MapsPlanner_API.settings import settings
 from MapsPlanner_API.web.application import get_app
 from sqlalchemy.ext.asyncio import (
@@ -130,9 +131,21 @@ async def users(dbsession: AsyncSession, request: FixtureRequest) -> List[UserOR
 
     for mock_user in mock_users:
         register_date = datetime.fromisoformat(mock_user.pop("register_date"))
-        user = UserORM(**mock_user, register_date=register_date)
+        birth_date = datetime.fromisoformat(mock_user.pop("birth_date"))
+        gender = EGender(mock_user.pop("gender"))
+
+        user = UserORM(
+            **mock_user,
+            register_date=register_date,
+            birth_date=birth_date,
+            gender=gender
+        )
         orm_users.append(user)
         dbsession.add(user)
+
+        # Create session for user
+        session: SessionORM = await SessionORM.create_session(dbsession, user)
+        dbsession.add(session)
 
     await dbsession.commit()
 

@@ -1,4 +1,5 @@
 import datetime
+import enum
 from typing import Optional, List
 
 from sqlalchemy import select
@@ -12,6 +13,11 @@ from MapsPlanner_API.db.base import Base
 from MapsPlanner_API.web.api.users.schema import User
 
 
+class EGender(enum.Enum):
+    male = "M"
+    female = "F"
+
+
 class UserORM(AsyncAttrs, Base):
     __tablename__ = "users"
 
@@ -23,8 +29,8 @@ class UserORM(AsyncAttrs, Base):
         DateTime(timezone=True), server_default=func.now()
     )
     profile_picture: Mapped[str] = mapped_column(String(), nullable=True)
-    gender: Mapped[str] = mapped_column(
-        ChoiceType((("M", "male"), ("F", "female")), impl=String(length=1)),
+    gender: Mapped[EGender] = mapped_column(
+        ChoiceType(EGender, impl=String(length=1)),
         nullable=True,
     )
 
@@ -38,7 +44,7 @@ class UserORM(AsyncAttrs, Base):
     )
 
     # Forward relations
-    tokens: Mapped[List["SessionORM"]] = relationship(
+    sessions: Mapped[List["SessionORM"]] = relationship(
         "SessionORM", back_populates="user"
     )
     trips: Mapped[List["TripORM"]] = relationship(

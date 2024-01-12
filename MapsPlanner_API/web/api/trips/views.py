@@ -32,6 +32,7 @@ async def get_trips(
             examples=["1704242003-1704328403"],
         )
     ] = (None, None),
+    user_id: Optional[int] = None,
     name: Optional[str] = None,
 ):
 
@@ -44,12 +45,14 @@ async def get_trips(
 
     start_filter, end_filter = creation_date
 
-    if start_filter:
+    if start_filter is not None:
         query = query.where(TripORM.creation_date >= start_filter)
-    if end_filter:
+    if end_filter is not None:
         query = query.where(TripORM.creation_date <= end_filter)
-    if name:
+    if name is not None:
         query = query.where(TripORM.name.ilike(name))
+    if user_id is not None:
+        query = query.where(TripORM.user_id == user_id)
 
     result = await db.execute(query)
     trips_orm = result.scalars()

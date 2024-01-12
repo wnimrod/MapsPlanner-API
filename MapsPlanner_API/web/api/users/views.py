@@ -54,7 +54,7 @@ async def current_user(user: Annotated[UserORM, Depends(get_current_user)]) -> U
 
 
 @router.get("/{user_id}")
-async def get_user_details(
+async def user_details(
     user: Annotated[UserORM, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
     user_id: int,
@@ -62,29 +62,7 @@ async def get_user_details(
     validate_request(user, user_id)
 
     if user := await db.get(UserORM, user_id):
-        total_trips_query = (
-            select(func.count()).select_from(TripORM).where(TripORM.user_id == user_id)
-        )
-        total_trips_result = await db.execute(total_trips_query)
-
-        total_markers_query = (
-            select(func.count())
-            .select_from(MarkerORM)
-            .where(TripORM.user_id == user_id)
-            .join(TripORM, MarkerORM.trip_id == TripORM.id)
-        )
-
-        total_markers_result = await db.execute(total_markers_query)
-
-        return UserDetails(
-            **user.to_api().model_dump(),
-            register_date=user.register_date,
-            fullname=f"{user.first_name} {user.last_name}",
-            total_trips=total_trips_result.scalar(),
-            total_markers=total_markers_result.scalar(),
-            birth_date=user.birth_date,
-            gender=user.gender.code,
-        )
+        return await UserDetails.build_from_orm(db, user)
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No Such user."

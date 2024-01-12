@@ -6,7 +6,9 @@
     "register_date": "2023-01-05",
     "profile_picture": null,
     "is_active": true,
-    "is_administrator": false
+    "is_administrator": false,
+    "gender": "M",
+    "birth_date": "1995-02-01"
   },
   {
     "first_name": "Jane",
@@ -15,7 +17,9 @@
     "register_date": "2023-02-10",
     "profile_picture": null,
     "is_active": true,
-    "is_administrator": false
+    "is_administrator": false,
+    "gender": "F",
+    "birth_date": "1995-07-01"
   },
   {
     "first_name": "Alice",
@@ -24,7 +28,9 @@
     "register_date": "2023-03-15",
     "profile_picture": null,
     "is_active": true,
-    "is_administrator": false
+    "is_administrator": false,
+    "gender": "F",
+    "birth_date": "2003-04-28"
   },
   {
     "first_name": "Bob",
@@ -33,7 +39,9 @@
     "register_date": "2023-04-20",
     "profile_picture": null,
     "is_active": true,
-    "is_administrator": false
+    "is_administrator": false,
+    "gender": "M",
+    "birth_date": "1995-03-06"
   },
   {
     "first_name": "Eva",
@@ -42,6 +50,8 @@
     "register_date": "2023-05-25",
     "profile_picture": null,
     "is_active": true,
-    "is_administrator": false
+    "is_administrator": false,
+    "gender": "F",
+    "birth_date": "1975-09-14"
   }
 ]

@@ -20,7 +20,7 @@ class SessionORM(AsyncAttrs, Base):
     DEFAULT_TOKEN_LENGTH = 64
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    user: Mapped[UserORM] = relationship(UserORM, back_populates="tokens")
+    user: Mapped[UserORM] = relationship(UserORM, back_populates="sessions")
 
     token: Mapped[str] = mapped_column(String, primary_key=True)
     creation_date: Mapped[datetime] = mapped_column(

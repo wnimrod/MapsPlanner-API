@@ -9,7 +9,7 @@ from starlette import status
 
 from MapsPlanner_API.db.models.Session import SessionORM
 from MapsPlanner_API.db.models.User import UserORM
-from MapsPlanner_API.web.api.users.schema import User
+from MapsPlanner_API.web.api.users.schema import User, UserDetails
 
 
 @pytest.mark.anyio
@@ -46,10 +46,57 @@ async def test_current_user(
 
 
 @pytest.mark.anyio
-async def test_user_details():
-    ...
+async def test_user_details(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    users: List[UserORM],
+):
+    target_user = users[0]
+    url = fastapi_app.url_path_for("user_details", user_id=target_user.id)
+
+    async def test_success(session: SessionORM):
+        response = await client.get(url, cookies={"token": session.token})
+        assert (
+            response.status_code == status.HTTP_200_OK
+        ), "Failed to fetch user details."
+        expected_user_details = await UserDetails.build_from_orm(dbsession, target_user)
+        actual_user_details = UserDetails(**response.json())
+        assert (
+            expected_user_details == actual_user_details
+        ), "User details does not match."
+
+    # Test 1: Make sure authorized user gets profiles
+    session, *other_sessions = await target_user.awaitable_attrs.sessions
+    await test_success(session)
+
+    # Test 2: Get another user, it should not have access to target user profile.
+    another_user = users[1]
+    session, *other_sessions = await another_user.awaitable_attrs.sessions
+    response = await client.get(url, cookies={"token": session.token})
+    assert (
+        response.status_code == status.HTTP_404_NOT_FOUND
+    ), "Data leak: User details where fetched to unauthorized user."
+
+    # Test 3: Administrator can access the data, anyway
+    another_user.is_administrator = True
+    dbsession.add(another_user)
+    await dbsession.commit()
+    await test_success(session)
 
 
 @pytest.mark.anyio
-async def test_update_user():
+async def test_update_user(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    users: List[UserORM],
+):
     ...
+    # target_user = users[0]
+    # url = fastapi_app.url_path_for("update_user", user_id=target_user.id)
+    #
+    # session, *other_sessions = await target_user.awaitable_attrs.sessions
+    # changes = UserUpdateRequest(first_name="Changed")
+    # response = await client.patch(url, json=changes, cookies={"token": session.token})
+    #

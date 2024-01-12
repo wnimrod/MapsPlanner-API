@@ -77,7 +77,7 @@ async def test_authentication_success(
     assert not len(result) > 1, f"Multiple users with email {user.email} created."
 
     # Test 2: Make sure we got the right token
-    user_tokens = [token.token for token in await user.awaitable_attrs.tokens]
+    user_tokens = [session.token for session in await user.awaitable_attrs.sessions]
     response_token = response.cookies["token"]
 
     assert response_token in user_tokens, "Invalid token returned."
