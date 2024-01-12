@@ -6,6 +6,7 @@ from sqlalchemy import String, DateTime, func, Boolean
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import expression
+from sqlalchemy_utils import ChoiceType
 
 from MapsPlanner_API.db.base import Base
 from MapsPlanner_API.web.api.users.schema import User
@@ -22,6 +23,15 @@ class UserORM(AsyncAttrs, Base):
         DateTime(timezone=True), server_default=func.now()
     )
     profile_picture: Mapped[str] = mapped_column(String(), nullable=True)
+    gender: Mapped[str] = mapped_column(
+        ChoiceType((("M", "male"), ("F", "female")), impl=String(length=1)),
+        nullable=True,
+    )
+
+    birth_date: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
     is_active: Mapped[bool] = mapped_column(Boolean())
     is_administrator: Mapped[bool] = mapped_column(
         Boolean(), server_default=expression.false()

@@ -43,3 +43,13 @@ async def test_current_user(
     # Test 3: The requested user is retrieved.
     response_user = User(**response.json())
     assert response_user == user.to_api()
+
+
+@pytest.mark.anyio
+async def test_user_details():
+    ...
+
+
+@pytest.mark.anyio
+async def test_update_user():
+    ...

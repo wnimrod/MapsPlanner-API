@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "MapsPlanner_API"
-version = "0.0.2"
+version = "0.0.3"
 description = "A backend for the MapsPlanner react application."
 authors = ["Nimrod Wagner <nimrod7676@gmail.com>"]
 maintainers = []
@@ -24,6 +24,7 @@ python-multipart = "0.0.6"
 requests = "2.31.0"
 openai = "1.6.1"
 geopy = "2.4.1"
+sqlalchemy-utils = "0.41.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.1"
