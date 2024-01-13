@@ -1,6 +1,7 @@
 import enum
 from pathlib import Path
 from tempfile import gettempdir
+from typing import Any
 
 from pydantic import Extra
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -8,6 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from yarl import URL
 
 from MapsPlanner_API import Environment
+from MapsPlanner_API.utils import JSONEncoder
 
 TEMP_DIR = Path(gettempdir())
 
@@ -85,6 +87,8 @@ class Settings(BaseSettings, extra=Extra.allow):
         env_file=".env",
         env_file_encoding="utf-8",
     )
+
+    json_serializer: Any = JSONEncoder().encode
 
 
 settings = Settings()

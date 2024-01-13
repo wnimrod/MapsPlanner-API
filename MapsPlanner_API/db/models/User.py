@@ -1,8 +1,8 @@
 import datetime
-import enum
+from enum import IntEnum
 from typing import Optional, List
 
-from sqlalchemy import select
+from sqlalchemy import select, Integer, event
 from sqlalchemy import String, DateTime, func, Boolean
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -10,12 +10,11 @@ from sqlalchemy.sql import expression
 from sqlalchemy_utils import ChoiceType
 
 from MapsPlanner_API.db.base import Base
-from MapsPlanner_API.web.api.users.schema import User
 
 
-class EGender(enum.Enum):
-    male = "M"
-    female = "F"
+class EGender(IntEnum):
+    male = 1
+    female = 2
 
 
 class UserORM(AsyncAttrs, Base):
@@ -30,7 +29,7 @@ class UserORM(AsyncAttrs, Base):
     )
     profile_picture: Mapped[str] = mapped_column(String(), nullable=True)
     gender: Mapped[EGender] = mapped_column(
-        ChoiceType(EGender, impl=String(length=1)),
+        ChoiceType(EGender, impl=Integer()),
         nullable=True,
     )
 
@@ -51,6 +50,10 @@ class UserORM(AsyncAttrs, Base):
         "TripORM", back_populates="user", order_by="desc(TripORM.id)"
     )
 
+    audit_logs: Mapped[List["AuditLogORM"]] = relationship(
+        "AuditLogORM", back_populates="user", order_by="desc(AuditLogORM.id)"
+    )
+
     def __str__(self) -> str:
         return f"User [#{self.id}]: {self.first_name} {self.last_name}"
 
@@ -63,7 +66,9 @@ class UserORM(AsyncAttrs, Base):
         result = await session.execute(query)
         return result.scalar_one_or_none()
 
-    def to_api(self) -> User:
+    def to_api(self) -> "User":
+        from MapsPlanner_API.web.api.users.schema import User
+
         return User(
             id=self.id,
             first_name=self.first_name,

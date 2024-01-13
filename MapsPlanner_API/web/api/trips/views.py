@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated, Optional, Callable
 
 import sqlalchemy.exc
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,15 +8,20 @@ from starlette import status
 from starlette.responses import Response
 
 from MapsPlanner_API.db.dependencies import get_db_session
+from MapsPlanner_API.db.models.AuditLog import EAuditLog
 from MapsPlanner_API.db.models.Trip import TripORM
 from MapsPlanner_API.db.models.User import UserORM
+from MapsPlanner_API.web.api.dependencies import (
+    get_current_user,
+    TAuditLogger,
+    get_audit_logger,
+)
 from MapsPlanner_API.web.api.query_filters import DateRangeFilter, PAGE_SIZE
 from MapsPlanner_API.web.api.trips.schema import (
     APITripCreationRequest,
     Trip,
     TripDetails,
 )
-from MapsPlanner_API.web.api.users.views import get_current_user
 
 router = APIRouter(prefix="/trips", tags=["Trips"])
 
@@ -103,6 +108,7 @@ async def create_trip(
     await db.commit()
 
     response.status_code = status.HTTP_201_CREATED
+
     return trip_orm.to_api()
 
 
@@ -112,6 +118,7 @@ async def delete_trip(
     response: Response,
     user: Annotated[UserORM, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
+    audit: Annotated[TAuditLogger, Depends(get_audit_logger)],
 ) -> dict:
     no_result_exception = HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip #{trip_id} not found."
@@ -121,6 +128,7 @@ async def delete_trip(
         trip = await db.get_one(TripORM, trip_id)
         if trip.is_accessible_to_user(user):
             await db.delete(trip)
+            await audit(action=EAuditLog.Deletion, target=trip)
             response.status_code = status.HTTP_204_NO_CONTENT
             return {}
         else:

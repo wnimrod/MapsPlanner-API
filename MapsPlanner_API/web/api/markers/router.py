@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 
 import sqlalchemy.exc
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,16 +8,23 @@ from starlette import status
 from starlette.responses import Response
 
 from MapsPlanner_API.db.dependencies import get_db_session
+from MapsPlanner_API.db.models.AuditLog import AuditLogORM, EAuditLog
 from MapsPlanner_API.db.models.Marker import MarkerORM
 from MapsPlanner_API.db.models.Trip import TripORM
 from MapsPlanner_API.db.models.User import UserORM
+from MapsPlanner_API.utils import Timer
+from MapsPlanner_API.web import api_logger
+from MapsPlanner_API.web.api.dependencies import (
+    get_current_user,
+    TAuditLogger,
+    get_audit_logger,
+)
 from MapsPlanner_API.web.api.markers.schema import (
     Marker,
     APIMarkerCreationRequest,
     APIMarkerUpdateRequest,
     APIMarkerGenerationRequest,
 )
-from MapsPlanner_API.web.api.users.views import get_current_user
 from MapsPlanner_API.web.api.markers.utils import validate_marker_for_user
 from MapsPlanner_API.web.api.markers.logic import MarkerLogic
 from MapsPlanner_API.web.api.markers.transformers import MarkerTransformer
@@ -103,6 +110,7 @@ async def generate_markers(
     payload: APIMarkerGenerationRequest,
     user: Annotated[UserORM, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
+    audit: Annotated[TAuditLogger, Depends(get_audit_logger)],
 ) -> List[Marker]:
     assert trip_id == payload.trip_id
 
@@ -110,7 +118,30 @@ async def generate_markers(
         db, user, trip_id, raise_on_not_found=True
     )
 
-    return await MarkerLogic.generate_markers_suggestions(db, trip, payload.categories)
+    generate_error: Optional[str] = None
+    markers: List[MarkerORM]
+
+    with Timer() as timer:
+        try:
+            api_logger.debug("Generating Markers with ChatGPT ...")
+            markers = await MarkerLogic.generate_markers_suggestions(
+                db, trip, payload.categories
+            )
+            api_logger.debug("Finished Markers generation with ChatGPT ...")
+        except Exception as e:
+            generate_error = str(e)
+            api_logger.error(
+                f"Failed to generate markers  with ChatGPT: {generate_error}"
+            )
+
+    await audit(
+        action=EAuditLog.ChatGPTQuery,
+        target=trip,
+        query_time=timer.total,
+        error=generate_error,
+    )
+
+    return [marker.to_api() for marker in markers]
 
 
 @router.patch("/{marker_id}")
@@ -118,26 +149,23 @@ async def update_marker(
     marker_id: int,
     payload: APIMarkerUpdateRequest,
     user: Annotated[UserORM, Depends(get_current_user)],
+    audit: Annotated[TAuditLogger, Depends(get_audit_logger)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> Marker:
-    update_fields = payload.model_dump(exclude_none=True)
-    user_trips_ids = [trip.id for trip in await user.awaitable_attrs.trips]
+    marker: Optional[MarkerORM] = await validate_marker_for_user(db, user, marker_id)
 
-    query = (
-        update(MarkerORM)
-        .where(MarkerORM.id == marker_id, MarkerORM.trip_id.in_(user_trips_ids))
-        .values(**update_fields)
-    )
-
-    update_result = await db.execute(query)
-
-    if update_result.rowcount == 0:
+    if marker is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Marker not found."
         )
-    else:
-        updated_marker = await db.get(MarkerORM, marker_id)
-        return updated_marker.to_api()
+
+    update_fields = payload.model_dump(exclude_none=True)
+    changes = marker.diff(update_fields)
+    marker.assign(update_fields)
+    db.add(marker)
+    await db.commit()
+    await audit(action=EAuditLog.Modification, target=marker, changes=changes)
+    return marker.to_api()
 
 
 @router.delete("/{marker_id}")
@@ -146,6 +174,7 @@ async def delete_marker(
     response: Response,
     user: Annotated[UserORM, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
+    audit: Annotated[TAuditLogger, Depends(get_audit_logger)],
 ):
     marker = await validate_marker_for_user(db, user, marker_id)
     if not marker:
@@ -154,4 +183,5 @@ async def delete_marker(
             detail=f"Marker #{marker_id} not found.",
         )
     await db.delete(marker)
+    await audit(action=EAuditLog.Deletion, target=marker)
     response.status_code = status.HTTP_204_NO_CONTENT

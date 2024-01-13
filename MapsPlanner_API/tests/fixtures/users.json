@@ -7,7 +7,7 @@
     "profile_picture": null,
     "is_active": true,
     "is_administrator": false,
-    "gender": "M",
+    "gender": 1,
     "birth_date": "1995-02-01"
   },
   {
@@ -18,7 +18,7 @@
     "profile_picture": null,
     "is_active": true,
     "is_administrator": false,
-    "gender": "F",
+    "gender": 2,
     "birth_date": "1995-07-01"
   },
   {
@@ -29,7 +29,7 @@
     "profile_picture": null,
     "is_active": true,
     "is_administrator": false,
-    "gender": "F",
+    "gender": 2,
     "birth_date": "2003-04-28"
   },
   {
@@ -40,7 +40,7 @@
     "profile_picture": null,
     "is_active": true,
     "is_administrator": false,
-    "gender": "M",
+    "gender": 1,
     "birth_date": "1995-03-06"
   },
   {
@@ -51,7 +51,7 @@
     "profile_picture": null,
     "is_active": true,
     "is_administrator": false,
-    "gender": "F",
+    "gender": 2,
     "birth_date": "1975-09-14"
   }
 ]

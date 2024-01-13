@@ -1,8 +1,11 @@
 import base64
+import json
+import time
+from datetime import datetime, date
+from enum import Enum
 from logging import getLogger
-from typing import Optional
+from typing import Optional, Dict, Any
 
-import re
 
 import requests
 
@@ -34,3 +37,27 @@ def raise_(exception: Exception):
     For testing purposes.
     """
     raise exception
+
+
+class Timer:
+    def __init__(self):
+        self.start = time.time()
+        self.total = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.total = time.time() - self.start
+
+
+class JSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, "serialize"):
+            return obj.serialize()
+        elif isinstance(obj, (date, datetime)):
+            return obj.isoformat()
+        elif isinstance(obj, Enum):
+            return obj.value
+        else:
+            return super().default(obj)

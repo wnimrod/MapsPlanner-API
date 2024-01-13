@@ -29,7 +29,7 @@ def upgrade() -> None:
         "users",
         sa.Column(
             "gender",
-            ChoiceType(EGender, impl=sa.String(length=1)),
+            ChoiceType(EGender, impl=sa.Integer()),
             nullable=True,
         ),
     )

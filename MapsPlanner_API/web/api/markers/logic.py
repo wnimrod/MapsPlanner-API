@@ -3,12 +3,13 @@ from typing import TypedDict, List
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from MapsPlanner_API.db.models.Marker import MarkerORM
 from MapsPlanner_API.db.models.Trip import TripORM
-from MapsPlanner_API.web.api.dependencies import async_chatgpt_client
+from MapsPlanner_API.web.api.chatgpt.chatgpt_client import async_chatgpt_client
+
 from MapsPlanner_API.web.api.markers.schema import (
     EMarkerCategory,
     APIMarkerCreationRequest,
-    Marker,
 )
 from MapsPlanner_API.web.api.markers.transformers import MarkerTransformer
 from MapsPlanner_API.web.api.trips.schema import Trip
@@ -34,7 +35,7 @@ class MarkerLogic:
     @classmethod
     async def generate_markers_suggestions(
         cls, db: AsyncSession, trip: TripORM | Trip, categories: List[EMarkerCategory]
-    ) -> List[Marker]:
+    ) -> List[MarkerORM]:
         queries = [
             cls.get_marker_suggestion_prompt(trip.name, category)
             for category in categories
@@ -58,5 +59,4 @@ class MarkerLogic:
 
         db.add_all(markers)
         await db.commit()
-
-        return [marker.to_api() for marker in markers]
+        return markers

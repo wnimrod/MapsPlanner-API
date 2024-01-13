@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from MapsPlanner_API.db.models.User import EGender
+
 
 class User(BaseModel):
     id: int
@@ -19,7 +21,7 @@ class User(BaseModel):
 class UserDetails(User):
     register_date: datetime
     birth_date: Optional[date]
-    gender: Optional[Literal["M", "F"]]
+    gender: Optional[EGender]
     fullname: str
     total_trips: int
     total_markers: int
@@ -62,4 +64,4 @@ class UserUpdateRequest(BaseModel):
     email: Optional[str] = None
     profile_picture: Optional[str] = None
     birth_date: Optional[date] = None
-    gender: Optional[Literal["M", "F"]] = None
+    gender: Optional[EGender] = None
