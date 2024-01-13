@@ -59,7 +59,7 @@ MapsPlanner_API
 ├── tests  # Tests for project.
 └── web  # Package contains web server. Handlers, startup config.
     ├── api  # Package with all handlers.
-    │   └── router.py  # Main router.
+    │   └── views.py  # Main router.
     ├── application.py  # FastAPI application configuration.
     └── lifetime.py  # Contains actions to perform on startup and shutdown.
 ```
@@ -69,12 +69,12 @@ MapsPlanner_API
 This application can be configured with environment variables.
 
 You can create `.env` file in the root directory and place all
-environment variables here. 
+environment variables here.
 
 All environment variables should start with "MAPSPLANNER_API_" prefix.
 
 For example if you see in your "MapsPlanner_API/settings.py" a variable named like
-`random_parameter`, you should provide the "MAPSPLANNER_API_RANDOM_PARAMETER" 
+`random_parameter`, you should provide the "MAPSPLANNER_API_RANDOM_PARAMETER"
 variable to configure the value. This behaviour can be changed by overriding `env_prefix` property
 in `MapsPlanner_API.settings.Settings.Config`.
 

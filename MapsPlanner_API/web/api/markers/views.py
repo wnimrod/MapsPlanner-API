@@ -2,32 +2,28 @@ from typing import Annotated, List, Optional
 
 import sqlalchemy.exc
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 from starlette.responses import Response
 
 from MapsPlanner_API.db.dependencies import get_db_session
-from MapsPlanner_API.db.models.AuditLog import AuditLogORM, EAuditLog
+from MapsPlanner_API.db.models.AuditLog import EAuditLog
 from MapsPlanner_API.db.models.Marker import MarkerORM
 from MapsPlanner_API.db.models.Trip import TripORM
 from MapsPlanner_API.db.models.User import UserORM
 from MapsPlanner_API.utils import Timer
 from MapsPlanner_API.web import api_logger
-from MapsPlanner_API.web.api.dependencies import (
-    get_current_user,
-    TAuditLogger,
-    get_audit_logger,
-)
-from MapsPlanner_API.web.api.markers.schema import (
-    Marker,
-    APIMarkerCreationRequest,
-    APIMarkerUpdateRequest,
-    APIMarkerGenerationRequest,
-)
-from MapsPlanner_API.web.api.markers.utils import validate_marker_for_user
+from MapsPlanner_API.web.api.dependencies import TAuditLogger, get_audit_logger, get_current_user
 from MapsPlanner_API.web.api.markers.logic import MarkerLogic
+from MapsPlanner_API.web.api.markers.schema import (
+    APIMarkerCreationRequest,
+    APIMarkerGenerationRequest,
+    APIMarkerUpdateRequest,
+    Marker,
+)
 from MapsPlanner_API.web.api.markers.transformers import MarkerTransformer
+from MapsPlanner_API.web.api.markers.utils import validate_marker_for_user
 from MapsPlanner_API.web.api.trips.utils import validate_trip_for_user
 
 router = APIRouter(prefix="/markers", tags=["Markers"])
@@ -56,7 +52,8 @@ async def get_trip_markers(
     db: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> List[Marker]:
     no_result_exception = HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail=f"Trip #{trip_id} not found."
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Trip #{trip_id} not found.",
     )
 
     try:
@@ -94,7 +91,7 @@ async def create_markers(
     ]
 
     markers_orm = MarkerTransformer.marker_creation_requests_to_markers(
-        valid_creation_requests
+        valid_creation_requests,
     )
 
     db.add_all(markers_orm)
@@ -115,7 +112,10 @@ async def generate_markers(
     assert trip_id == payload.trip_id
 
     trip: TripORM = await validate_trip_for_user(
-        db, user, trip_id, raise_on_not_found=True
+        db,
+        user,
+        trip_id,
+        raise_on_not_found=True,
     )
 
     generate_error: Optional[str] = None
@@ -125,13 +125,15 @@ async def generate_markers(
         try:
             api_logger.debug("Generating Markers with ChatGPT ...")
             markers = await MarkerLogic.generate_markers_suggestions(
-                db, trip, payload.categories
+                db,
+                trip,
+                payload.categories,
             )
             api_logger.debug("Finished Markers generation with ChatGPT ...")
         except Exception as e:
             generate_error = str(e)
             api_logger.error(
-                f"Failed to generate markers  with ChatGPT: {generate_error}"
+                f"Failed to generate markers  with ChatGPT: {generate_error}",
             )
 
     await audit(
@@ -156,7 +158,8 @@ async def update_marker(
 
     if marker is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Marker not found."
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Marker not found.",
         )
 
     update_fields = payload.model_dump(exclude_none=True)
