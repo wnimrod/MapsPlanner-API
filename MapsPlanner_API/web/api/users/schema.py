@@ -1,8 +1,8 @@
-from datetime import datetime, date
-from typing import Optional, Literal
+from datetime import date, datetime
+from typing import Optional
 
 from pydantic import BaseModel
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from MapsPlanner_API.db.models.User import EGender
@@ -54,7 +54,7 @@ class UserDetails(User):
             total_trips=total_trips_result.scalar(),
             total_markers=total_markers_result.scalar(),
             birth_date=user.birth_date,
-            gender=user.gender.value,
+            gender=user.gender.value if user.gender else None,
         )
 
 

@@ -1,10 +1,10 @@
 import datetime
 from enum import IntEnum
-from typing import Optional, List
+from typing import List, Optional
 
-from sqlalchemy import select, Integer, event
-from sqlalchemy import String, DateTime, func, Boolean
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs
+import sqlalchemy.orm
+from sqlalchemy import Boolean, DateTime, Integer, String, func, select
+from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import expression
 from sqlalchemy_utils import ChoiceType
@@ -21,11 +21,14 @@ class UserORM(AsyncAttrs, Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    user_id = sqlalchemy.orm.synonym("id")
+
     first_name: Mapped[str] = mapped_column(String())
     last_name: Mapped[str] = mapped_column(String())
     email: Mapped[str] = mapped_column(String())
     register_date: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime(timezone=True),
+        server_default=func.now(),
     )
     profile_picture: Mapped[str] = mapped_column(String(), nullable=True)
     gender: Mapped[EGender] = mapped_column(
@@ -34,24 +37,31 @@ class UserORM(AsyncAttrs, Base):
     )
 
     birth_date: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), nullable=True
+        DateTime(timezone=True),
+        nullable=True,
     )
 
     is_active: Mapped[bool] = mapped_column(Boolean())
     is_administrator: Mapped[bool] = mapped_column(
-        Boolean(), server_default=expression.false()
+        Boolean(),
+        server_default=expression.false(),
     )
 
     # Forward relations
     sessions: Mapped[List["SessionORM"]] = relationship(
-        "SessionORM", back_populates="user"
+        "SessionORM",
+        back_populates="user",
     )
     trips: Mapped[List["TripORM"]] = relationship(
-        "TripORM", back_populates="user", order_by="desc(TripORM.id)"
+        "TripORM",
+        back_populates="user",
+        order_by="desc(TripORM.id)",
     )
 
     audit_logs: Mapped[List["AuditLogORM"]] = relationship(
-        "AuditLogORM", back_populates="user", order_by="desc(AuditLogORM.id)"
+        "AuditLogORM",
+        back_populates="user",
+        order_by="desc(AuditLogORM.id)",
     )
 
     def __str__(self) -> str:

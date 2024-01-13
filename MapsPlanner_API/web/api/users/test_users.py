@@ -55,8 +55,12 @@ async def test_user_details(
     target_user = users[0]
     url = fastapi_app.url_path_for("user_details", user_id=target_user.id)
 
-    async def test_success(session: SessionORM):
-        response = await client.get(url, cookies={"token": session.token})
+    async def test_success(session: SessionORM, admin: bool):
+        response = await client.get(
+            url,
+            params={"impersonate_user_id": "all"},
+            cookies={"token": session.token},
+        )
         assert (
             response.status_code == status.HTTP_200_OK
         ), "Failed to fetch user details."
@@ -68,12 +72,16 @@ async def test_user_details(
 
     # Test 1: Make sure authorized user gets profiles
     session, *other_sessions = await target_user.awaitable_attrs.sessions
-    await test_success(session)
+    await test_success(session, admin=False)
 
     # Test 2: Get another user, it should not have access to target user profile.
     another_user = users[1]
     session, *other_sessions = await another_user.awaitable_attrs.sessions
-    response = await client.get(url, cookies={"token": session.token})
+    response = await client.get(
+        url,
+        params={"impersonate_user_id": "all"},
+        cookies={"token": session.token},
+    )
     assert (
         response.status_code == status.HTTP_404_NOT_FOUND
     ), "Data leak: User details where fetched to unauthorized user."
@@ -82,7 +90,7 @@ async def test_user_details(
     another_user.is_administrator = True
     dbsession.add(another_user)
     await dbsession.commit()
-    await test_success(session)
+    await test_success(session, admin=True)
 
 
 @pytest.mark.anyio

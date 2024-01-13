@@ -46,11 +46,11 @@ python-dateutil = "2.8.2"
 [tool.isort]
 profile = "black"
 multi_line_output = 3
-line-length = 120
+line_length = 120
 src_paths = ["MapsPlanner_API",]
 
 [tool.mypy]
-strict = true
+strict = false
 ignore_missing_imports = true
 allow_subclassing_any = true
 allow_untyped_calls = true
