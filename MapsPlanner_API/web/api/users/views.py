@@ -8,12 +8,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from MapsPlanner_API.db.dependencies import get_db_session
-from MapsPlanner_API.db.models.AuditLog import EAuditLog
+from MapsPlanner_API.db.models.AuditLog import EAuditAction
 from MapsPlanner_API.db.models.User import UserORM
-from MapsPlanner_API.web.api.dependencies import TAuditLogger, get_audit_logger, get_current_user, get_queryset
+from MapsPlanner_API.web.api.dependencies import (
+    TAuditLogger,
+    get_audit_logger,
+    get_current_user,
+    get_queryset,
+)
 from MapsPlanner_API.web.api.users.schema import User, UserDetails, UserUpdateRequest
 
-logger = getLogger("app")
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -71,5 +75,5 @@ async def update_user(
     db.add(target_user)
     await db.commit()
 
-    await audit(action=EAuditLog.Modification, target=target_user, changes=changes)
+    await audit(action=EAuditAction.Modification, target=target_user, changes=changes)
     return user.to_api()

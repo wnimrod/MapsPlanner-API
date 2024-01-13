@@ -8,12 +8,21 @@ from starlette import status
 from starlette.responses import Response
 
 from MapsPlanner_API.db.dependencies import get_db_session
-from MapsPlanner_API.db.models.AuditLog import EAuditLog
+from MapsPlanner_API.db.models.AuditLog import EAuditAction
 from MapsPlanner_API.db.models.Trip import TripORM
 from MapsPlanner_API.db.models.User import UserORM
-from MapsPlanner_API.web.api.dependencies import TAuditLogger, get_audit_logger, get_current_user, get_queryset
+from MapsPlanner_API.web.api.dependencies import (
+    TAuditLogger,
+    get_audit_logger,
+    get_current_user,
+    get_queryset,
+)
 from MapsPlanner_API.web.api.query_filters import DateRangeFilter
-from MapsPlanner_API.web.api.trips.schema import APITripCreationRequest, Trip, TripDetails
+from MapsPlanner_API.web.api.trips.schema import (
+    APITripCreationRequest,
+    Trip,
+    TripDetails,
+)
 
 router = APIRouter(prefix="/trips", tags=["Trips"])
 
@@ -103,7 +112,7 @@ async def delete_trip(
         trip_orm: TripORM = (await db.execute(query)).scalar_one()
 
         await db.delete(trip_orm)
-        await audit(action=EAuditLog.Deletion, target=trip_orm)
+        await audit(action=EAuditAction.Deletion, target=trip_orm)
 
         response.status_code = status.HTTP_204_NO_CONTENT
         return {}

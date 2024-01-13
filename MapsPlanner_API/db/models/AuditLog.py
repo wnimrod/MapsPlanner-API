@@ -1,19 +1,21 @@
+import importlib
 from datetime import datetime
 from enum import IntEnum
-from importlib import import_module
+from pydoc import locate
 from typing import Optional, TypedDict
 
 from sqlalchemy import Integer, JSON, ForeignKey, DateTime, func
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs, AsyncSessionTransaction
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy_utils import ChoiceType
 
 from MapsPlanner_API.db.base import Base as BaseORM
+from MapsPlanner_API.db.connection import get_session
 from MapsPlanner_API.db.models.User import UserORM
 from MapsPlanner_API.db.models.types import TTarget, TChanges
 
 
-class EAuditLog(IntEnum):
+class EAuditAction(IntEnum):
     Creation = 1
     Modification = 2
     Deletion = 3
@@ -25,7 +27,7 @@ class ExtraFieldMapping(TypedDict):
     changes: dict[str, TChanges]
 
 
-class AuditLogORM(BaseORM):
+class AuditLogORM(AsyncAttrs, BaseORM):
     """
     Logs important actions that made on the system.
     """
@@ -36,7 +38,9 @@ class AuditLogORM(BaseORM):
     creation_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
-    action: Mapped[EAuditLog] = mapped_column(ChoiceType(EAuditLog, impl=Integer()))
+    action: Mapped[EAuditAction] = mapped_column(
+        ChoiceType(EAuditAction, impl=Integer())
+    )
     extra: Mapped[ExtraFieldMapping] = mapped_column(
         JSON(none_as_null=True), nullable=True
     )
@@ -57,7 +61,7 @@ class AuditLogORM(BaseORM):
         extra = {}
         if target:
             extra["target"] = {
-                "model": f"{target.__class__.__module__}.{target.__class__.__name__}",
+                "model": f"{target.__class__.__name__}",
                 "id": target.id,
             }
         if changes:
@@ -69,7 +73,7 @@ class AuditLogORM(BaseORM):
     async def log(
         cls,
         db: AsyncSession,
-        action: EAuditLog,
+        action: EAuditAction,
         *,
         user: Optional[UserORM] = None,
         target: Optional[BaseORM] = None,
@@ -82,11 +86,24 @@ class AuditLogORM(BaseORM):
         await db.commit()
         return audit_log
 
-    async def instance(self, db: AsyncSession) -> Optional[BaseORM]:
+    @property
+    async def instance(self) -> Optional[BaseORM]:
         """
         Returns the instance of the object associated with this audit log.
         """
 
         if target := self.extra.get("target"):
-            model = import_module(target.model)
-            return await db.get(model, target.id)
+            model = locate(f"MapsPlanner_API.db.models.{target['model']}")
+            async with get_session() as db:
+                return await db.get(model, target["id"])
+
+    async def to_api(self) -> "AuditLog":
+        from MapsPlanner_API.web.api.audit.schema import AuditLog
+
+        return AuditLog(
+            id=self.id,
+            creation_date=self.creation_date,
+            action=self.action,
+            user_id=self.user_id,
+            target=self.extra.get("target"),
+        )

@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Annotated, Any, Awaitable, Callable, Literal
+from typing import Annotated, Any, Awaitable, Callable, Literal, Type
 
 from fastapi import Depends, HTTPException
 from sqlalchemy import Select, select
@@ -52,23 +52,23 @@ async def get_audit_logger(
     return partial(AuditLogORM.log, db, user=user)
 
 
-def get_queryset(Model: BaseORM, order_field: Optional[str] = "id"):
+def get_queryset(model_class: Type[BaseORM], order_field: Optional[str] = "id"):
     async def _make_dependency(
         user: Annotated[UserORM, Depends(get_current_user)],
         page: Optional[int] = None,
         impersonate_user_id: Optional[int | Literal["all"]] = None,
     ) -> Select:
-        query = select(Model)
+        query = select(model_class)
 
         # Access control - Filter by user id
         if impersonate_user_id is None or user.is_administrator is False:
-            query = query.where(Model.user_id == user.id)
+            query = query.where(model_class.user_id == user.id)
         elif impersonate_user_id != "all":
-            query = query.where(Model.user_id == impersonate_user_id)
+            query = query.where(model_class.user_id == impersonate_user_id)
 
         # Order results
         if order_field is not None:
-            query = query.order_by(getattr(Model, order_field).desc())
+            query = query.order_by(getattr(model_class, order_field).desc())
 
         # Should paginate?
         if page is not None:

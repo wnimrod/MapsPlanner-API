@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 from sqlalchemy_utils import ChoiceType
 
-from MapsPlanner_API.db.models.AuditLog import EAuditLog
+from MapsPlanner_API.db.models.AuditLog import EAuditAction
 
 # revision identifiers, used by Alembic.
 revision = "3c5727a374c3"
@@ -30,7 +30,9 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
             nullable=False,
         ),
-        sa.Column("action", ChoiceType(EAuditLog, impl=sa.Integer()), nullable=False),
+        sa.Column(
+            "action", ChoiceType(EAuditAction, impl=sa.Integer()), nullable=False
+        ),
         sa.Column("extra", sa.JSON(none_as_null=True), nullable=True),
         sa.Column("user_id", sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(

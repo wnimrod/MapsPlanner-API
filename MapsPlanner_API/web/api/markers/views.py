@@ -8,13 +8,17 @@ from starlette import status
 from starlette.responses import Response
 
 from MapsPlanner_API.db.dependencies import get_db_session
-from MapsPlanner_API.db.models.AuditLog import EAuditLog
+from MapsPlanner_API.db.models.AuditLog import EAuditAction
 from MapsPlanner_API.db.models.Marker import MarkerORM
 from MapsPlanner_API.db.models.Trip import TripORM
 from MapsPlanner_API.db.models.User import UserORM
 from MapsPlanner_API.utils import Timer
 from MapsPlanner_API.web import api_logger
-from MapsPlanner_API.web.api.dependencies import TAuditLogger, get_audit_logger, get_current_user
+from MapsPlanner_API.web.api.dependencies import (
+    TAuditLogger,
+    get_audit_logger,
+    get_current_user,
+)
 from MapsPlanner_API.web.api.markers.logic import MarkerLogic
 from MapsPlanner_API.web.api.markers.schema import (
     APIMarkerCreationRequest,
@@ -137,7 +141,7 @@ async def generate_markers(
             )
 
     await audit(
-        action=EAuditLog.ChatGPTQuery,
+        action=EAuditAction.ChatGPTQuery,
         target=trip,
         query_time=timer.total,
         error=generate_error,
@@ -167,7 +171,7 @@ async def update_marker(
     marker.assign(update_fields)
     db.add(marker)
     await db.commit()
-    await audit(action=EAuditLog.Modification, target=marker, changes=changes)
+    await audit(action=EAuditAction.Modification, target=marker, changes=changes)
     return marker.to_api()
 
 
@@ -186,5 +190,5 @@ async def delete_marker(
             detail=f"Marker #{marker_id} not found.",
         )
     await db.delete(marker)
-    await audit(action=EAuditLog.Deletion, target=marker)
+    await audit(action=EAuditAction.Deletion, target=marker)
     response.status_code = status.HTTP_204_NO_CONTENT
