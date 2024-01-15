@@ -139,13 +139,17 @@ async def generate_markers(
             api_logger.error(
                 f"Failed to generate markers  with ChatGPT: {generate_error}",
             )
-
-    await audit(
-        action=EAuditAction.ChatGPTQuery,
-        target=trip,
-        query_time=timer.total,
-        error=generate_error,
-    )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate markers.",
+            )
+        finally:
+            await audit(
+                action=EAuditAction.ChatGPTQuery,
+                target=trip,
+                query_time=timer.total,
+                error=generate_error,
+            )
 
     return [marker.to_api() for marker in markers]
 
