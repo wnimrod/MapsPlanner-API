@@ -43,7 +43,7 @@
       <env name="db_host" value="localhost" />
       <env name="db_port" value="15432" />
     </envs>
-    <option name="SDK_HOME" value="C:\Users\Nimrod\AppData\Local\pypoetry\Cache\virtualenvs\mapsplanner-api-2TS7HA3Q-py3.11\Scripts\python.exe" />
+    <option name="SDK_HOME" value="$USER_HOME$/.cache/pypoetry/virtualenvs/mapsplanner-api-mpW06PX_-py3.10/bin/python" />
     <option name="SDK_NAME" value="Poetry (MapsPlanner-API)" />
     <option name="WORKING_DIRECTORY" value="" />
     <option name="IS_MODULE_SDK" value="false" />
@@ -64,7 +64,7 @@
     </EXTENSION>
     <option name="_new_keywords" value="&quot;&quot;" />
     <option name="_new_parameters" value="&quot;&quot;" />
-    <option name="_new_additionalArguments" value="&quot;&quot;" />
+    <option name="_new_additionalArguments" value="&quot;-W ignore&quot;" />
     <option name="_new_target" value="&quot;$PROJECT_DIR$&quot;" />
     <option name="_new_targetType" value="&quot;PATH&quot;" />
     <method v="2" />

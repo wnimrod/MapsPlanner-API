@@ -48,7 +48,6 @@ async def get_audit_logger(
     user: Annotated[UserORM, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> TAuditLogger:
-
     return partial(AuditLogORM.log, db, user=user)
 
 

@@ -1,12 +1,11 @@
-import importlib
 from datetime import datetime
 from enum import IntEnum
 from pydoc import locate
 from typing import Optional, TypedDict
 
 from sqlalchemy import Integer, JSON, ForeignKey, DateTime, func
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs, AsyncSessionTransaction
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs
+from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
 from sqlalchemy_utils import ChoiceType
 
 from MapsPlanner_API.db.base import Base as BaseORM
@@ -47,6 +46,14 @@ class AuditLogORM(AsyncAttrs, BaseORM):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
     user: Mapped[UserORM] = relationship(UserORM, back_populates="audit_logs")
+
+    target_model = column_property(
+        extra["target"]["model"].as_string().label("target_model"), deferred=True
+    )
+
+    target_id = column_property(
+        extra["target"]["id"].as_integer().label("target_id"), deferred=True
+    )
 
     @classmethod
     def _build_extra(

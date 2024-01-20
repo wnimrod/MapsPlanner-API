@@ -45,6 +45,17 @@ async def test_current_user(
     assert response_user == user.to_api()
 
 
+@pytest.mark.asyncio
+@pytest.mark.xfail
+async def test_users_list(
+    fastapi_app: FastAPI,
+    client: AsyncClient,
+    dbsession: AsyncSession,
+    users: List[UserORM],
+):
+    raise NotImplemented()
+
+
 @pytest.mark.anyio
 async def test_user_details(
     fastapi_app: FastAPI,

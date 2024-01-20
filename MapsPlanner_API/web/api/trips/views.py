@@ -2,6 +2,7 @@ from typing import Annotated, Optional
 
 import sqlalchemy.exc
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi_filter import FilterDepends
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -22,6 +23,7 @@ from MapsPlanner_API.web.api.trips.schema import (
     APITripCreationRequest,
     Trip,
     TripDetails,
+    TripFilter,
 )
 
 router = APIRouter(prefix="/trips", tags=["Trips"])
@@ -31,23 +33,9 @@ router = APIRouter(prefix="/trips", tags=["Trips"])
 async def get_trips(
     db: Annotated[AsyncSession, Depends(get_db_session)],
     query: Annotated[Select, Depends(get_queryset(TripORM))],
-    creation_date: Optional[
-        DateRangeFilter(
-            description='Unix timestamp date range, in format of "start...end".',
-            examples=["1704242003-1704328403"],
-        )
-    ] = (None, None),
-    name: Optional[str] = None,
+    trip_filter: Annotated[TripFilter, FilterDepends(TripFilter)],
 ):
-    start_filter, end_filter = creation_date
-
-    if start_filter is not None:
-        query = query.where(TripORM.creation_date >= start_filter)
-    if end_filter is not None:
-        query = query.where(TripORM.creation_date <= end_filter)
-    if name is not None:
-        query = query.where(TripORM.name.ilike(name))
-
+    query = trip_filter.filter(query)
     result = await db.execute(query)
     trips_orm = result.scalars()
 

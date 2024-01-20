@@ -53,7 +53,7 @@ class Settings(BaseSettings, extra=Extra.allow):
     db_user: str = environ["db_user"]
     db_pass: str = environ["db_pass"]
     db_base: str = environ["db_base"]
-    db_echo: bool = environ.get("db_echo", False)
+    db_echo: bool = True  # environ.get("db_echo", False)
 
     backend_url: str = environ["backend_url"]
     frontend_url: str = environ["frontend_url"]

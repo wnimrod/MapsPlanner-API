@@ -1,8 +1,9 @@
 from logging import getLogger
-from typing import Annotated
+from typing import Annotated, List
 
 import sqlalchemy.exc
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi_filter import FilterDepends
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -16,8 +17,12 @@ from MapsPlanner_API.web.api.dependencies import (
     get_current_user,
     get_queryset,
 )
-from MapsPlanner_API.web.api.users.schema import User, UserDetails, UserUpdateRequest
-
+from MapsPlanner_API.web.api.users.schema import (
+    User,
+    UserDetails,
+    UserUpdateRequest,
+    UserFilter,
+)
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -28,6 +33,19 @@ async def current_user(user: Annotated[UserORM, Depends(get_current_user)]) -> U
     Returns details of the currently connected user
     """
     return user.to_api()
+
+
+@router.get("/")
+async def users_list(
+    db: Annotated[AsyncSession, Depends(get_db_session)],
+    query: Annotated[Select, Depends(get_queryset(UserORM))],
+    user_filter: Annotated[UserFilter, FilterDepends(UserFilter)],
+) -> List[User]:
+    query = user_filter.filter(query)
+    users_result = await db.execute(query)
+    users: List[UserORM] = users_result.scalars()
+
+    return [user.to_api() for user in users]
 
 
 @router.get("/{user_id}")

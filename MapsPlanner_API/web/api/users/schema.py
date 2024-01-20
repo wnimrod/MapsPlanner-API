@@ -1,17 +1,20 @@
 from datetime import date, datetime
 from typing import Optional
 
+from fastapi_filter.contrib.sqlalchemy import Filter
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from MapsPlanner_API.db.models.User import EGender
+from MapsPlanner_API.db.models.User import EGender, UserORM
+from MapsPlanner_API.web.api.query_filters.date_range import DateRangeFilterMixin
 
 
 class User(BaseModel):
     id: int
     first_name: str
     last_name: str
+    full_name: str
     email: str
     profile_picture: Optional[str]
     is_active: bool
@@ -22,7 +25,7 @@ class UserDetails(User):
     register_date: datetime
     birth_date: Optional[date]
     gender: Optional[EGender]
-    fullname: str
+    full_name: str
     total_trips: int
     total_markers: int
 
@@ -50,7 +53,6 @@ class UserDetails(User):
         return UserDetails(
             **user.to_api().model_dump(),
             register_date=user.register_date,
-            fullname=f"{user.first_name} {user.last_name}",
             total_trips=total_trips_result.scalar(),
             total_markers=total_markers_result.scalar(),
             birth_date=user.birth_date,
@@ -65,3 +67,15 @@ class UserUpdateRequest(BaseModel):
     profile_picture: Optional[str] = None
     birth_date: Optional[date] = None
     gender: Optional[EGender] = None
+
+
+class UserFilter(DateRangeFilterMixin, Filter):
+    email__ilike: Optional[str] = None
+    full_name__ilike: Optional[str] = None
+    gender: Optional[EGender] = None
+
+    search: Optional[str] = None
+
+    class Constants(Filter.Constants):
+        model = UserORM
+        search_model_fields = ["full_name", "email"]

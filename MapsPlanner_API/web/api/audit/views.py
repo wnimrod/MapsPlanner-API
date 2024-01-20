@@ -1,13 +1,16 @@
 from typing import List, Annotated, Optional
 
 from fastapi import APIRouter, Depends
+from fastapi_filter import FilterDepends
+from fastapi_sa_orm_filter.main import FilterCore
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from MapsPlanner_API.db.dependencies import get_db_session
 from MapsPlanner_API.db.models.AuditLog import AuditLogORM, EAuditAction
-from MapsPlanner_API.web.api.audit.schema import AuditLog
+from MapsPlanner_API.web.api.audit.schema import AuditLog, AuditFilter
 from MapsPlanner_API.web.api.dependencies import get_queryset
+
 
 router = APIRouter(prefix="/audit", tags=["Audit"])
 
@@ -16,18 +19,9 @@ router = APIRouter(prefix="/audit", tags=["Audit"])
 async def audit_logs(
     db: Annotated[AsyncSession, Depends(get_db_session)],
     query: Annotated[Select, Depends(get_queryset(AuditLogORM))],
-    action: Optional[EAuditAction] = None,
-    target_model: Optional[str] = None,
-    target_id: Optional[int] = None,
+    audit_filter: Annotated[AuditFilter, FilterDepends(AuditFilter)],
 ) -> List[AuditLog]:
-    if action is not None:
-        query = query.where(AuditLogORM.action == action)
-    if target_model is not None:
-        query = query.where(
-            AuditLogORM.extra["target", "model"].as_string() == target_model
-        )
-    if target_id is not None:
-        query = query.where(AuditLogORM.extra["target", "id"].as_integer() == target_id)
+    query = audit_filter.filter(query)
 
     audit_logs_result = await db.execute(query)
     audit_logs: List[AuditLogORM] = audit_logs_result.scalars()

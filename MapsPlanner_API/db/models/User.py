@@ -5,7 +5,7 @@ from typing import List, Optional
 import sqlalchemy.orm
 from sqlalchemy import Boolean, DateTime, Integer, String, func, select
 from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
 from sqlalchemy.sql import expression
 from sqlalchemy_utils import ChoiceType
 
@@ -25,6 +25,8 @@ class UserORM(AsyncAttrs, Base):
 
     first_name: Mapped[str] = mapped_column(String())
     last_name: Mapped[str] = mapped_column(String())
+    full_name = column_property(first_name + " " + last_name, deferred=True)
+
     email: Mapped[str] = mapped_column(String())
     register_date: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
@@ -83,6 +85,7 @@ class UserORM(AsyncAttrs, Base):
             id=self.id,
             first_name=self.first_name,
             last_name=self.last_name,
+            full_name=f"{self.first_name} {self.last_name}",
             email=self.email,
             profile_picture=self.profile_picture,
             is_active=self.is_active,

@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
-from typing import Optional, Annotated
+from typing_extensions import Optional, Annotated, Self
 
 import dateutil.parser
 from fastapi.params import Query
-from pydantic import AfterValidator
+from pydantic import AfterValidator, field_validator, model_validator
 
 
 def date_range_param_validator(
@@ -25,6 +25,28 @@ def date_range_param_validator(
         return date_range
     except ValueError as err:
         raise ValueError("Invalid format for date range field.") from err
+
+
+class DateRangeFilterMixin:
+    # TODO: Add the ability to give other name than `creation_date`
+    creation_range: Optional[str] = None
+
+    # Dynamically generated
+    creation_date__gte: Optional[datetime] = None
+    creation_date__lte: Optional[datetime] = None
+
+    @field_validator("creation_range", mode="after")
+    def validate_creation_range(cls, creation_range):
+        return date_range_param_validator(creation_range)
+
+    @model_validator(mode="after")
+    def validate(self) -> Self:
+        self.creation_date__gte, self.creation_date__lte = self.creation_range or (
+            None,
+            None,
+        )
+        del self.creation_range
+        return self
 
 
 def DateRangeFilter(description="", examples=None):
