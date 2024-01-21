@@ -53,7 +53,7 @@ class Settings(BaseSettings, extra=Extra.allow):
     db_user: str = environ["db_user"]
     db_pass: str = environ["db_pass"]
     db_base: str = environ["db_base"]
-    db_echo: bool = True  # environ.get("db_echo", False)
+    db_echo: bool = environ.get("db_echo", False)
 
     backend_url: str = environ["backend_url"]
     frontend_url: str = environ["frontend_url"]
@@ -66,6 +66,9 @@ class Settings(BaseSettings, extra=Extra.allow):
 
     # ChatGPT
     chatgpt_api_key: str = environ["chatgpt_api_key"]
+
+    # Maptiler
+    maptiler_api_key: str = environ["maptiler_api_key"]
 
     @property
     def db_url(self) -> URL:

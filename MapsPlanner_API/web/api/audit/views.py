@@ -1,13 +1,12 @@
-from typing import List, Annotated, Optional
+from typing import List, Annotated
 
 from fastapi import APIRouter, Depends
 from fastapi_filter import FilterDepends
-from fastapi_sa_orm_filter.main import FilterCore
 from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from MapsPlanner_API.db.dependencies import get_db_session
-from MapsPlanner_API.db.models.AuditLog import AuditLogORM, EAuditAction
+from MapsPlanner_API.db.models.AuditLog import AuditLogORM
 from MapsPlanner_API.web.api.audit.schema import AuditLog, AuditFilter
 from MapsPlanner_API.web.api.dependencies import get_queryset
 
