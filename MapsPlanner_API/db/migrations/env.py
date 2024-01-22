@@ -4,6 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy.ext.asyncio.engine import create_async_engine
 from sqlalchemy.future import Connection
+
 from MapsPlanner_API.db.meta import meta
 from MapsPlanner_API.db.models import load_all_models
 from MapsPlanner_API.settings import settings

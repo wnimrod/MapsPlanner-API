@@ -1,4 +1,4 @@
-from typing import List, Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends
 from fastapi_filter import FilterDepends
@@ -7,9 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from MapsPlanner_API.db.dependencies import get_db_session
 from MapsPlanner_API.db.models.AuditLog import AuditLogORM
-from MapsPlanner_API.web.api.audit.schema import AuditLog, AuditFilter
+from MapsPlanner_API.web.api.audit.schema import AuditFilter, AuditLog
 from MapsPlanner_API.web.api.dependencies import get_queryset
-
 
 router = APIRouter(prefix="/audit", tags=["Audit"])
 

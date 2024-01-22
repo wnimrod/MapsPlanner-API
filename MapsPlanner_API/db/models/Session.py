@@ -1,8 +1,9 @@
 import binascii
 import os
 from datetime import datetime, timezone
-from sqlalchemy import String, func, DateTime, ForeignKey
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs
+
+from sqlalchemy import DateTime, ForeignKey, String, func
+from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from MapsPlanner_API.db.base import Base
@@ -25,7 +26,8 @@ class SessionORM(AsyncAttrs, Base):
 
     token: Mapped[str] = mapped_column(String, primary_key=True)
     creation_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime(timezone=True),
+        server_default=func.now(),
     )
 
     @classmethod

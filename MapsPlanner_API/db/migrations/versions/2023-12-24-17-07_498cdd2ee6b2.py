@@ -1,7 +1,7 @@
 """Initial version
 
 Revision ID: 498cdd2ee6b2
-Revises: 
+Revises:
 Create Date: 2023-12-24 17:07:25.918504
 
 """
@@ -61,7 +61,10 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column(
-            "description", sa.String(), server_default=sa.text("''"), nullable=False
+            "description",
+            sa.String(),
+            server_default=sa.text("''"),
+            nullable=False,
         ),
         sa.Column("picture", sa.String(), nullable=True),
         sa.Column(

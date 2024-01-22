@@ -1,5 +1,4 @@
 import json
-
 from datetime import datetime
 from pathlib import Path
 from typing import Any, AsyncGenerator, List, Literal
@@ -8,19 +7,19 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from fastapi import FastAPI
 from httpx import AsyncClient
-
-from MapsPlanner_API.db.models.Session import SessionORM
-from MapsPlanner_API.db.models.User import UserORM, EGender
-from MapsPlanner_API.settings import settings
-from MapsPlanner_API.web.application import get_app
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
+
 from MapsPlanner_API.db.dependencies import get_db_session
+from MapsPlanner_API.db.models.Session import SessionORM
+from MapsPlanner_API.db.models.User import EGender, UserORM
 from MapsPlanner_API.db.utils import create_database, drop_database
+from MapsPlanner_API.settings import settings
+from MapsPlanner_API.web.application import get_app
 
 
 @pytest.fixture(scope="session")
@@ -104,7 +103,8 @@ def fastapi_app(
 
 @pytest.fixture
 async def client(
-    fastapi_app: FastAPI, anyio_backend: Any
+    fastapi_app: FastAPI,
+    anyio_backend: Any,
 ) -> AsyncGenerator[AsyncClient, None]:
     """
     Fixture that creates client for requesting server.
@@ -123,7 +123,7 @@ async def users(dbsession: AsyncSession, request: FixtureRequest) -> List[UserOR
     """
 
     with open(
-        Path(request.config.rootpath, "MapsPlanner_API/tests/fixtures/users.json")
+        Path(request.config.rootpath, "MapsPlanner_API/tests/fixtures/users.json"),
     ) as mock_file:
         mock_users: List[dict] = json.load(mock_file)
 
@@ -154,7 +154,9 @@ async def users(dbsession: AsyncSession, request: FixtureRequest) -> List[UserOR
 
 @pytest.fixture(params=["unauthorized", "regular", "administrator"])
 async def access_token(
-    dbsession: AsyncSession, users: List[UserORM], request: FixtureRequest
+    dbsession: AsyncSession,
+    users: List[UserORM],
+    request: FixtureRequest,
 ) -> SessionORM:
     """
     Issues a token for a certain user type to work on API requests with.

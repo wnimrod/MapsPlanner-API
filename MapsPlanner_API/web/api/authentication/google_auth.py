@@ -1,8 +1,8 @@
 from logging import getLogger
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Depends
 import requests
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -12,7 +12,6 @@ from MapsPlanner_API.db.dependencies import get_db_session
 from MapsPlanner_API.db.models.Session import SessionORM
 from MapsPlanner_API.db.models.User import UserORM
 from MapsPlanner_API.settings import settings
-
 
 router = APIRouter(prefix="/google")
 
@@ -102,7 +101,7 @@ async def login_google(
             # Set session cookie
             session: SessionORM = await SessionORM.create_session(db, user_orm)
             response = RedirectResponse(
-                f"{settings.frontend_url}?signed_up={int(user_created)}"
+                f"{settings.frontend_url}?signed_up={int(user_created)}",
             )
             response.set_cookie(key="token", value=session.token, secure=True)
             return response

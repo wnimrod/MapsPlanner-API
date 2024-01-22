@@ -5,7 +5,7 @@ from typing import List, Optional
 import sqlalchemy.orm
 from sqlalchemy import Boolean, DateTime, Integer, String, func, select
 from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
+from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 from sqlalchemy.sql import expression
 from sqlalchemy_utils import ChoiceType
 

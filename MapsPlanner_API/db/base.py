@@ -1,6 +1,7 @@
-from typing import Dict, Any
+from typing import Any, Dict
 
 from sqlalchemy.orm import DeclarativeBase
+
 from MapsPlanner_API.db.meta import meta
 from MapsPlanner_API.db.models.types import TChanges
 

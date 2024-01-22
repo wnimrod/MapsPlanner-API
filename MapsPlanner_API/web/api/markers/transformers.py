@@ -7,7 +7,8 @@ from MapsPlanner_API.web.api.markers.schema import APIMarkerCreationRequest
 class MarkerTransformer:
     @classmethod
     def marker_creation_requests_to_markers(
-        cls, creation_requests: List[APIMarkerCreationRequest]
+        cls,
+        creation_requests: List[APIMarkerCreationRequest],
     ) -> List[MarkerORM]:
         return [
             MarkerORM(

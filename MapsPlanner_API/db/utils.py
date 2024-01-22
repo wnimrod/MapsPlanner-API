@@ -1,6 +1,7 @@
 from sqlalchemy import text
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import create_async_engine
+
 from MapsPlanner_API.settings import settings
 
 
@@ -8,14 +9,16 @@ async def create_database() -> None:
     """Create a database."""
     db_url = make_url(str(settings.db_url.with_path("/postgres")))
     engine = create_async_engine(
-        db_url, isolation_level="AUTOCOMMIT", echo=settings.db_echo
+        db_url,
+        isolation_level="AUTOCOMMIT",
+        echo=settings.db_echo,
     )
 
     async with engine.connect() as conn:
         database_existance = await conn.execute(
             text(
                 f"SELECT 1 FROM pg_database WHERE datname='{settings.db_base}'",  # noqa: E501, S608
-            )
+            ),
         )
         database_exists = database_existance.scalar() == 1
 
@@ -26,7 +29,7 @@ async def create_database() -> None:
         await conn.execute(
             text(
                 f'CREATE DATABASE "{settings.db_base}" ENCODING "utf8" TEMPLATE template1',  # noqa: E501
-            )
+            ),
         )
 
 
@@ -34,7 +37,9 @@ async def drop_database() -> None:
     """Drop current database."""
     db_url = make_url(str(settings.db_url.with_path("/postgres")))
     engine = create_async_engine(
-        db_url, isolation_level="AUTOCOMMIT", echo=settings.db_echo
+        db_url,
+        isolation_level="AUTOCOMMIT",
+        echo=settings.db_echo,
     )
     async with engine.connect() as conn:
         disc_users = (

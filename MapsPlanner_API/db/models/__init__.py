@@ -1,12 +1,11 @@
+import pkgutil
+from pathlib import Path
+
 from MapsPlanner_API.db.models.AuditLog import AuditLogORM
 from MapsPlanner_API.db.models.Marker import MarkerORM
 from MapsPlanner_API.db.models.Session import SessionORM
 from MapsPlanner_API.db.models.Trip import TripORM
 from MapsPlanner_API.db.models.User import UserORM
-
-
-import pkgutil
-from pathlib import Path
 
 
 def load_all_models() -> None:

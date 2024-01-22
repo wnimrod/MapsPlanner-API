@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 import sqlalchemy.exc
 from fastapi import APIRouter, Depends, HTTPException
@@ -18,7 +18,6 @@ from MapsPlanner_API.web.api.dependencies import (
     get_current_user,
     get_queryset,
 )
-from MapsPlanner_API.web.api.query_filters import DateRangeFilter
 from MapsPlanner_API.web.api.trips.schema import (
     APITripCreationRequest,
     Trip,

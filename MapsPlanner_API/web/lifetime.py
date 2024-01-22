@@ -1,8 +1,9 @@
 from typing import Awaitable, Callable
 
 from fastapi import FastAPI
-from MapsPlanner_API.settings import settings
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+from MapsPlanner_API.settings import settings
 
 
 def _setup_db(app: FastAPI) -> None:  # pragma: no cover

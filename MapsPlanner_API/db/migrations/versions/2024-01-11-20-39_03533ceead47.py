@@ -5,11 +5,11 @@ Revises: 498cdd2ee6b2
 Create Date: 2024-01-11 20:39:04.908177
 
 """
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy_utils import ChoiceType
-
 import enum
+
+import sqlalchemy as sa
+from alembic import op
+from sqlalchemy_utils import ChoiceType
 
 # revision identifiers, used by Alembic.
 revision = "03533ceead47"
@@ -34,7 +34,8 @@ def upgrade() -> None:
         ),
     )
     op.add_column(
-        "users", sa.Column("birth_date", sa.DateTime(timezone=True), nullable=True)
+        "users",
+        sa.Column("birth_date", sa.DateTime(timezone=True), nullable=True),
     )
     # ### end Alembic commands ###
 

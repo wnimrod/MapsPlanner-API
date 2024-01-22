@@ -1,8 +1,8 @@
-from sqlalchemy import ForeignKey, String, Float, Integer
+from sqlalchemy import Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from MapsPlanner_API.db.base import Base
-from MapsPlanner_API.web.api.markers.schema import Marker, EMarkerCategory
+from MapsPlanner_API.web.api.markers.schema import EMarkerCategory, Marker
 
 
 class MarkerORM(Base):

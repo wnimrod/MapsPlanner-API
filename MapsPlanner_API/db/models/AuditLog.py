@@ -3,15 +3,15 @@ from enum import IntEnum
 from pydoc import locate
 from typing import Optional, TypedDict
 
-from sqlalchemy import Integer, JSON, ForeignKey, DateTime, func
-from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs
-from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, func
+from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncSession
+from sqlalchemy.orm import Mapped, column_property, mapped_column, relationship
 from sqlalchemy_utils import ChoiceType
 
 from MapsPlanner_API.db.base import Base as BaseORM
 from MapsPlanner_API.db.connection import get_session
+from MapsPlanner_API.db.models.types import TChanges, TTarget
 from MapsPlanner_API.db.models.User import UserORM
-from MapsPlanner_API.db.models.types import TTarget, TChanges
 
 
 class EAuditAction(IntEnum):
@@ -35,24 +35,28 @@ class AuditLogORM(AsyncAttrs, BaseORM):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     creation_date: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime(timezone=True),
+        server_default=func.now(),
     )
     action: Mapped[EAuditAction] = mapped_column(
-        ChoiceType(EAuditAction, impl=Integer())
+        ChoiceType(EAuditAction, impl=Integer()),
     )
     extra: Mapped[ExtraFieldMapping] = mapped_column(
-        JSON(none_as_null=True), nullable=True
+        JSON(none_as_null=True),
+        nullable=True,
     )
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
     user: Mapped[UserORM] = relationship(UserORM, back_populates="audit_logs")
 
     target_model = column_property(
-        extra["target"]["model"].as_string().label("target_model"), deferred=True
+        extra["target"]["model"].as_string().label("target_model"),
+        deferred=True,
     )
 
     target_id = column_property(
-        extra["target"]["id"].as_integer().label("target_id"), deferred=True
+        extra["target"]["id"].as_integer().label("target_id"),
+        deferred=True,
     )
 
     @classmethod

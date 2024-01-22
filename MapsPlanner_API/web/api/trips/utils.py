@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import HTTPException
@@ -8,11 +9,12 @@ from starlette import status
 from MapsPlanner_API.db.models.Trip import TripORM
 from MapsPlanner_API.db.models.User import UserORM
 
-from datetime import datetime, timezone
-
 
 async def validate_trip_for_user(
-    db: AsyncSession, user: UserORM, trip_id: int, raise_on_not_found: bool = False
+    db: AsyncSession,
+    user: UserORM,
+    trip_id: int,
+    raise_on_not_found: bool = False,
 ) -> Optional[TripORM]:
     where_clause = [TripORM.id == trip_id]
 

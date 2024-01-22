@@ -2,6 +2,6 @@ version: '3.9'
 
 
 services:
-  api: &main_app
+  api:
     env_file:
-      - .env.pytest
+    - .env.pytest

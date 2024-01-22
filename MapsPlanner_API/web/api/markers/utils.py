@@ -8,7 +8,9 @@ from MapsPlanner_API.db.models.User import UserORM
 
 
 async def validate_marker_for_user(
-    db: AsyncSession, user: UserORM, marker_id: int
+    db: AsyncSession,
+    user: UserORM,
+    marker_id: int,
 ) -> Optional[MarkerORM]:
     where_clause = [MarkerORM.id == marker_id]
     if not user.is_administrator:

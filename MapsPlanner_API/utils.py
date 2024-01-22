@@ -1,11 +1,10 @@
 import base64
 import json
 import time
-from datetime import datetime, date
+from datetime import date, datetime
 from enum import Enum
 from logging import getLogger
-from typing import Optional, Dict, Any
-
+from typing import Optional
 
 import requests
 

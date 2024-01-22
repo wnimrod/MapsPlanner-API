@@ -1,4 +1,4 @@
-from typing import List, Optional, Literal
+from typing import List, Literal, Optional
 
 from openai import AsyncOpenAI
 from pydantic import BaseModel
@@ -17,7 +17,9 @@ class ChatGPTClient:
         self._default_config = ChatGPTConfig()
 
     async def query(
-        self, queries: List[str], config: Optional[ChatGPTConfig] = None
+        self,
+        queries: List[str],
+        config: Optional[ChatGPTConfig] = None,
     ) -> List[str]:
         config = config or self._default_config
         messages = [

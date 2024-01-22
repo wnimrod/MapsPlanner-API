@@ -2,12 +2,10 @@ from fastapi import FastAPI
 from fastapi.responses import UJSONResponse
 from starlette.middleware.cors import CORSMiddleware
 
+from MapsPlanner_API import __version__
 from MapsPlanner_API.settings import settings
 from MapsPlanner_API.web.api.router import api_router
-
 from MapsPlanner_API.web.lifetime import register_shutdown_event, register_startup_event
-
-from MapsPlanner_API import __version__
 
 
 def get_app() -> FastAPI:

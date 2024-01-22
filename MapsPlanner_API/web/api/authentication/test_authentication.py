@@ -1,10 +1,10 @@
 from typing import List
 
 import pytest
-import requests.exceptions
 from _pytest.monkeypatch import MonkeyPatch
 from fastapi import FastAPI
 from httpx import AsyncClient
+from requests.exceptions import HTTPError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -16,8 +16,6 @@ from MapsPlanner_API.web.api.authentication.google_auth import (
     GoogleAuthenticator,
     GoogleUserInfo,
 )
-
-from requests.exceptions import HTTPError
 
 
 @pytest.mark.anyio
@@ -90,7 +88,9 @@ async def test_authentication_success(
 
 @pytest.mark.anyio
 async def test_authentication_failed(
-    monkeypatch: MonkeyPatch, fastapi_app: FastAPI, client: AsyncClient
+    monkeypatch: MonkeyPatch,
+    fastapi_app: FastAPI,
+    client: AsyncClient,
 ):
     monkeypatch.setattr(
         GoogleAuthenticator,

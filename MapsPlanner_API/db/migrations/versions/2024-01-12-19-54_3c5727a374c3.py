@@ -5,9 +5,8 @@ Revises: 03533ceead47
 Create Date: 2024-01-12 19:54:09.646242
 
 """
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 from sqlalchemy_utils import ChoiceType
 
 from MapsPlanner_API.db.models.AuditLog import EAuditAction
@@ -31,7 +30,9 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column(
-            "action", ChoiceType(EAuditAction, impl=sa.Integer()), nullable=False
+            "action",
+            ChoiceType(EAuditAction, impl=sa.Integer()),
+            nullable=False,
         ),
         sa.Column("extra", sa.JSON(none_as_null=True), nullable=True),
         sa.Column("user_id", sa.Integer(), nullable=True),

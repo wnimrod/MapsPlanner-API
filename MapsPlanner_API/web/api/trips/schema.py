@@ -1,17 +1,15 @@
 import datetime
-from typing import Optional, List
+from typing import List, Optional
+from urllib.parse import urlparse
 
 from fastapi_filter.contrib.sqlalchemy import Filter
 from pydantic import BaseModel, field_validator
 
 from MapsPlanner_API.db.models import TripORM
+from MapsPlanner_API.utils import image_url_as_base64
 from MapsPlanner_API.web.api.markers.schema import Marker
 from MapsPlanner_API.web.api.query_filters.date_range import DateRangeFilterMixin
 from MapsPlanner_API.web.api.schema import DateRangeFilter
-
-from urllib.parse import urlparse
-
-from MapsPlanner_API.utils import image_url_as_base64
 
 
 class Trip(BaseModel):

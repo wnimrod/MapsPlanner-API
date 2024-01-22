@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
-from typing_extensions import Optional, Annotated, Self
 
 import dateutil.parser
 from fastapi.params import Query
 from pydantic import AfterValidator, field_validator, model_validator
+from typing_extensions import Annotated, Optional, Self
 
 
 def date_range_param_validator(
@@ -20,7 +20,7 @@ def date_range_param_validator(
                 date_range.append(dateutil.parser.parse(timestr))
             except ValueError:
                 date_range.append(
-                    datetime.fromtimestamp(float(timestr), tz=timezone.utc)
+                    datetime.fromtimestamp(float(timestr), tz=timezone.utc),
                 )
         return date_range
     except ValueError as err:

@@ -5,7 +5,6 @@ from typing import Any
 
 from pydantic import Extra
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 from yarl import URL
 
 from MapsPlanner_API import Environment

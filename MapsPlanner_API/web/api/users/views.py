@@ -1,4 +1,3 @@
-from logging import getLogger
 from typing import Annotated, List
 
 import sqlalchemy.exc
@@ -20,8 +19,8 @@ from MapsPlanner_API.web.api.dependencies import (
 from MapsPlanner_API.web.api.users.schema import (
     User,
     UserDetails,
-    UserUpdateRequest,
     UserFilter,
+    UserUpdateRequest,
 )
 
 router = APIRouter(prefix="/users", tags=["Users"])

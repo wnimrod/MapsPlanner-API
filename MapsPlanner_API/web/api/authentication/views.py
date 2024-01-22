@@ -8,6 +8,7 @@ from starlette.responses import Response
 
 from MapsPlanner_API.db.dependencies import get_db_session
 from MapsPlanner_API.db.models import SessionORM
+
 from .google_auth import router as google_auth_router
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])

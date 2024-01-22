@@ -15,5 +15,4 @@ services:
       reload: "True"
   db:
     ports:
-      - "15432:5432"
-
+    - "15432:5432"

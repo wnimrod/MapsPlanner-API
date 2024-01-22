@@ -2,7 +2,7 @@ import datetime
 from typing import List
 
 import sqlalchemy
-from sqlalchemy import String, DateTime, func, ForeignKey
+from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,11 +23,13 @@ class TripORM(AsyncAttrs, Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String())
     description: Mapped[str] = mapped_column(
-        String(), server_default=sqlalchemy.text("''")
+        String(),
+        server_default=sqlalchemy.text("''"),
     )
     picture: Mapped[str | None] = mapped_column(String(), nullable=True)
     creation_date: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime(timezone=True),
+        server_default=func.now(),
     )
 
     # Forward relations
