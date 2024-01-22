@@ -1,12 +1,13 @@
 import binascii
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import String, func, DateTime, ForeignKey
 from sqlalchemy.ext.asyncio import AsyncSession, AsyncAttrs
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from MapsPlanner_API.db.base import Base
 from MapsPlanner_API.db.models.User import UserORM
+from MapsPlanner_API.utils import classproperty
 
 
 class SessionORM(AsyncAttrs, Base):
@@ -38,3 +39,7 @@ class SessionORM(AsyncAttrs, Base):
         db.add(session)
         await db.commit()
         return session
+
+    @classproperty
+    def empty(cls) -> "SessionORM":
+        return cls(token="", creation_date=datetime.now(tz=timezone.utc), user_id=None)

@@ -69,7 +69,6 @@ async def user_details(
 
 @router.patch("/{user_id}")
 async def update_user(
-    user: Annotated[UserORM, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db_session)],
     audit: Annotated[TAuditLogger, Depends(get_audit_logger)],
     query: Annotated[Select, Depends(get_queryset(UserORM))],
@@ -94,4 +93,4 @@ async def update_user(
     await db.commit()
 
     await audit(action=EAuditAction.Modification, target=target_user, changes=changes)
-    return user.to_api()
+    return target_user.to_api()

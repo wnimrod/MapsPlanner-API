@@ -2,7 +2,7 @@ import json
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, AsyncGenerator, List
+from typing import Any, AsyncGenerator, List, Literal
 
 import pytest
 from _pytest.fixtures import FixtureRequest
@@ -150,3 +150,28 @@ async def users(dbsession: AsyncSession, request: FixtureRequest) -> List[UserOR
     await dbsession.commit()
 
     return orm_users
+
+
+@pytest.fixture(params=["unauthorized", "regular", "administrator"])
+async def access_token(
+    dbsession: AsyncSession, users: List[UserORM], request: FixtureRequest
+) -> SessionORM:
+    """
+    Issues a token for a certain user type to work on API requests with.
+    """
+    user: UserORM = users[0]
+    user_type: Literal["unauthorized", "regular", "administrator"] = request.param
+
+    if user_type == "unauthorized":
+        return SessionORM.empty
+    if user_type == "regular":
+        user.is_administrator = False
+    elif user_type == "administrator":
+        user.is_administrator = True
+    else:
+        raise ValueError("Unrecognized user type")
+
+    dbsession.add(user)
+    await dbsession.commit()
+
+    return await SessionORM.create_session(dbsession, user)
