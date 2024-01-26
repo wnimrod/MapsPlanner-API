@@ -34,8 +34,8 @@ class Settings(BaseSettings, extra=Extra.allow):
     with environment variables.
     """
 
-    host: str = environ.get("host", "127.0.0.1")
-    port: int = environ.get("port", 8000)
+    host: str = environ["host"]
+    port: int = environ["port"]
     # quantity of workers for uvicorn
     workers_count: int = 1
     # Enable uvicorn reloading
