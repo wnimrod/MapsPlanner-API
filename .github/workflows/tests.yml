@@ -10,9 +10,9 @@ jobs:
       MapsPlanner_API-db:
         image: postgres:13.8-bullseye
         env:
-          POSTGRES_PASSWORD: MapsPlanner_API
-          POSTGRES_USER: MapsPlanner_API
-          POSTGRES_DB: MapsPlanner_API
+          POSTGRES_USER: maps_planner_api
+          POSTGRES_PASSWORD: maps_planner_api
+          POSTGRES_DB: maps_planner_api_pytest
         options: >-
           --health-cmd="pg_isready"
           --health-interval=10s
@@ -36,7 +36,7 @@ jobs:
         host: 0.0.0.0
         port: 8888
         db_host: localhost
-        db_port: 15432
+        db_port: 5432
         db_user: maps_planner_api
         db_pass: maps_planner_api
         db_base: maps_planner_api_pytest
