@@ -31,7 +31,7 @@ jobs:
       env:
         POETRY_VIRTUALENVS_CREATE: false
     - name: Run pytest check
-      run: poetry run pytest -vv --cov="MapsPlanner_API" .
+      run: poetry run pytest -vv --cov="MapsPlanner_API" . -W ignore --html=pytest-report.html --self-contained-html
       env:
         host: 0.0.0.0
         port: 8888
