@@ -44,6 +44,7 @@ ipython = "8.19.0"
 nltk = "3.8.1"
 python-dateutil = "2.8.2"
 pytest-html = "4.1.1"
+pytest-dotenv = "0.5.2"
 
 [tool.isort]
 profile = "black"
@@ -72,6 +73,8 @@ filterwarnings = [
     "ignore:.*unclosed.*:ResourceWarning",
 ]
 env = []
+env_override_existing_values = 1
+env_files = [".env", ".env.pytest"]
 
 [fastapi-template.options]
 project_name = "MapsPlanner_API"
