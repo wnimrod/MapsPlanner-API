@@ -6,3 +6,7 @@ stop:
 	docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.dev.yml --project-directory . down
 test:
 	docker-compose -f deploy/docker-compose.yml -f deploy/docker-compose.pytest.yml --project-directory . run --rm --name pytest api pytest -vv .
+deploy-image:
+	docker-compose -f deploy/docker-compose.yml --project-directory . build --no-cache
+	docker-compose -f deploy/docker-compose.yml --project-directory . push
+

@@ -29,35 +29,33 @@ environment variables here.
  
 The file structure is as the following:
 
-```
-host=
-port=
-db_host=
-db_port=
-db_user=
-db_pass=
-db_base=
+| Name                      | Descrition                                             | Mandatory                                      |
+|---------------------------|--------------------------------------------------------|------------------------------------------------|
+| host                      | The host that the uvicorn server will use.             | Yes                                            |
+| port                      | The port that the uvicorn server will use.             | Yes                                            |
+| db_host                   | Database Host                                          | Yes                                            |
+| db_user                   | Database User                                          | Yes                                            |
+| POSTGRES_USER             | Same as `db_user`                                      |   Yes
+| db_password               | Database Password                                      | Yes                                            |
+| POSTGRES_DB               | Same as `db_password`                                  |   Yes
+| db_base                   | Database Name                                          | Yes                                            |
+| POSTGRES_DB        | Same as `db_base`                                      |   Yes
+| backend_url               | The full address of this server                        | Yes                                            |
+| frontend_url              | The full address of the MapsPlanner web application    | Yes                  |
+| google_auth_client_id     | Google auth client ID                                  | Yes                                            |
+| google_auth_client_secret | Google auth client secret                              | Yes                                            |
+| google_auth_client_secret | Google auth client secret                              | Yes                                            |
+| google_auth_client_secret | Google auth client secret                              | Yes                                            |
+ | chatgpt_api_key           | ChatAPI api key for marker suggestions                 | Yes, otherwise marker suggestion will be disabled 
+ | log_level                 | Set Log Level                                          | No. Defaults to LogLevel.DEBUG                           
+ | environment               | The running environment. Options: local, prod , pytest |                                             Yes
+ | user_auto_approval        | Whether every sign-in user is created as active or no. |                                             No, defaults to True
+| extra_allowed_origins        | Additional origins added to CORS.                      |                                             No
 
-backend_url=
-frontend_url=
 
-google_auth_client_id=
-google_auth_client_secret=
 
-chatgpt_api_key=
 
-user_auto_approval=
 
-environment=
-
-log_level=
-
-# Docker compose
-
-POSTGRES_PASSWORD=
-POSTGRES_USER=
-POSTGRES_DB=
-```
 
 
 An example of `.env` file:

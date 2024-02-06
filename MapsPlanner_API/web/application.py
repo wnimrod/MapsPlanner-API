@@ -36,9 +36,9 @@ def get_app() -> FastAPI:
     allow_origins = [
         settings.frontend_url,
         settings.backend_url,
-        f"https://{settings.host}:${settings.port}",
-        f"http://{settings.host}:${settings.port}",
-    ]
+        f"https://{settings.host}:{settings.port}",
+        f"http://{settings.host}:{settings.port}",
+    ] + settings.extra_allowed_origins
 
     # Register middlewares
     app.add_middleware(

@@ -1,7 +1,7 @@
 import enum
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Any
+from typing import Any, List
 
 from pydantic import Extra
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -41,7 +41,7 @@ class Settings(BaseSettings, extra=Extra.allow):
     # Enable uvicorn reloading
     reload: bool = False
 
-    log_level: LogLevel = LogLevel.DEBUG
+    log_level: LogLevel = environ.get("log_level", LogLevel.DEBUG)
 
     # Current environment
     environment: Environment = Environment(environ["environment"])
@@ -52,7 +52,7 @@ class Settings(BaseSettings, extra=Extra.allow):
     db_user: str = environ["db_user"]
     db_pass: str = environ["db_pass"]
     db_base: str = environ["db_base"]
-    db_echo: bool = environ.get("db_echo", False)
+    db_echo: bool = log_level == LogLevel.DEBUG
 
     backend_url: str = environ["backend_url"]
     frontend_url: str = environ["frontend_url"]
@@ -64,10 +64,22 @@ class Settings(BaseSettings, extra=Extra.allow):
     google_auth_client_secret: str = environ["google_auth_client_secret"]
 
     # ChatGPT
-    chatgpt_api_key: str = environ["chatgpt_api_key"]
+    chatgpt_api_key: str = environ.get("chatgpt_api_key")
 
     # Maptiler
-    maptiler_api_key: str = environ["maptiler_api_key"]
+    maptiler_api_key: str = environ.get("maptiler_api_key")
+
+    # Allowed origins on cors
+
+    @property
+    def extra_allowed_origins(self) -> List[str]:
+        allowed_origins = environ.get("allowed_origins") or []
+
+        return [
+            stripped_origin
+            for allowed_origin in allowed_origins
+            if len(stripped_origin := allowed_origin.strip()) > 0
+        ]
 
     @property
     def db_url(self) -> URL:
